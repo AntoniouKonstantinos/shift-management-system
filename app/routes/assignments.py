@@ -74,7 +74,7 @@ def update_assignment_status(assignment_id):
 
     from datetime import datetime
     if new_status == "confirmed" and not assignment.check_in:
-        pass  # Check-in is done separately, not automatically at Confirm
+        pass  # check-in is done separately, not automatically at confirm
     if new_status == "completed":
         assignment.check_out = datetime.utcnow()
 
