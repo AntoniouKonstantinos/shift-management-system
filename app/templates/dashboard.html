@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Shifts Calendar{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <button id="prev-week">&laquo; Previous</button>
+    <h2 id="week-label"></h2>
+    <button id="next-week">Next &raquo;</button>
+</div>
+
+<div id="calendar-grid" class="calendar-grid"></div>
+
+<div id="assign-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3>Employee Assignment</h3>
+        <select id="candidate-select"></select>
+        <div class="modal-actions">
+            <button id="confirm-assign">Assign</button>
+            <button id="cancel-assign">Cancel</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock %}
