@@ -52,18 +52,18 @@ function renderTable(requests) {
 }
 
 function statusLabel(status) {
-    const labels = { pending: "Εκκρεμεί", approved: "Εγκεκριμένη", rejected: "Απορρίφθηκε" };
+    const labels = { pending: "Pending", approved: "Approved", rejected: "Rejected" };
     return labels[status] || status;
 }
 
 function renderActions(req) {
     if (req.status === "pending") {
         return `
-            <button class="approve-btn" data-id="${req.id}">Έγκριση</button>
-            <button class="reject-btn" data-id="${req.id}">Απόρριψη</button>
+            <button class="approve-btn" data-id="${req.id}">Approve</button>
+            <button class="reject-btn" data-id="${req.id}">Reject</button>
         `;
     }
-    return `<button class="delete-btn" data-id="${req.id}">Διαγραφή</button>`;
+    return `<button class="delete-btn" data-id="${req.id}">Delete</button>`;
 }
 
 function openModal() {
@@ -107,7 +107,7 @@ async function handleDecision(id, decision) {
 }
 
 async function handleDelete(id) {
-    if (!confirm("Διαγραφή αυτού του αιτήματος;")) return;
+    if (!confirm("Delete this request?")) return;
 
     try {
         await api.delete(`/time-off/${id}`);
