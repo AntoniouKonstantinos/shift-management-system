@@ -1,10 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Time-off{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="page-header">
+    <h2>Time-off Requests</h2>
+    <button id="new-request-btn">+ New Request</button>
+</div>
+
+<div class="filter-bar">
+    <label>Status:</label>
+    <select id="status-filter">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+    </select>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="time-off-body"></tbody>
+</table>
+
+<div id="request-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3>New Time-off Request</h3>
+        <form id="request-form">
+            <label>Employee</label>
+            <select id="employee-select" required></select>
+
+            <label>Start Date</label>
+            <input type="date" id="start-date" required>
+
+            <label>End Date</label>
+            <input type="date" id="end-date" required>
+
+            <label>Reason</label>
+            <input type="text" id="reason">
+
+            <div class="modal-actions">
+                <button type="submit">Submit</button>
+                <button type="button" id="cancel-request">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/time_off.js') }}"></script>
+{% endblock %}

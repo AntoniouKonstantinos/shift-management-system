@@ -1,10 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Stuff{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="page-header">
+    <h2>Stuff</h2>
+    <button id="new-employee-btn">+ New Employee</button>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Hiring Date</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="employees-body"></tbody>
+</table>
+
+<div id="employee-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="modal-title">New Employee</h3>
+        <form id="employee-form">
+            <input type="hidden" id="employee-id">
+
+            <label>First-Last Name</label>
+            <input type="text" id="full-name" required>
+
+            <label>Email</label>
+            <input type="email" id="email" required>
+
+            <label>Phone Number</label>
+            <input type="text" id="phone">
+
+            <label>Role</label>
+            <select id="role-select" required></select>
+
+            <div class="modal-actions">
+                <button type="submit">Save</button>
+                <button type="button" id="cancel-employee">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/employees.js') }}"></script>
+{% endblock %}

@@ -16,12 +16,14 @@ def create_app(config_name="default"):
     from app.routes.assignments import bp as assignments_bp
     from app.routes.availability import bp as availability_bp
     from app.routes.time_off import bp as time_off_bp
+    from app.routes.roles import bp as roles_bp
 
     app.register_blueprint(employees_bp)
     app.register_blueprint(shifts_bp)
     app.register_blueprint(assignments_bp)
     app.register_blueprint(availability_bp)
     app.register_blueprint(time_off_bp)
+    app.register_blueprint(roles_bp)
 
     from app.routes.views import bp as views_bp
     app.register_blueprint(views_bp)
