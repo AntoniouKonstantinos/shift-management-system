@@ -25,6 +25,17 @@ industry experience in hospitality.
 - **Weekly calendar dashboard** — browse shifts week by week and assign
   staff directly from the grid.
 
+## Screenshots
+
+**Weekly calendar with staff assignment**
+![Dashboard](screenshots/dashboard.png)
+
+**Staff management**
+![Employees](screenshots/employees.png)
+
+**Time-off approval workflow**
+![Time off](screenshots/time_off.png)
+
 ## Tech Stack
 
 - **Backend:** Flask, Flask-SQLAlchemy
@@ -107,7 +118,10 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run the app
+# 3. (Optional) Populate the database with sample data
+python seed.py
+
+# 4. Run the app
 python run.py
 ```
 
