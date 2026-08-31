@@ -26,61 +26,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.000000000000244" />
-      <entry key="S30" value="1.0004600014440226" />
-      <entry key="S60" value="1.1014143696368264" />
-      <entry key="M2" value="2.5218339374385192" />
-      <entry key="M5" value="8.804330956328673" />
-      <entry key="M10" value="14.920399149443151" />
-      <entry key="M15" value="18.86348276854099" />
-      <entry key="M30" value="33.11269461589099" />
-      <entry key="H1" value="73.29892607087508" />
-      <entry key="H2" value="136.54086190537365" />
-      <entry key="H4" value="197.19981886247908" />
-      <entry key="D1" value="275.1997863583147" />
-      <entry key="W1" value="292.06999230312135" />
+      <entry key="MS100" value="1.4383028606580175" />
+      <entry key="MS500" value="1.8479199646331477" />
+      <entry key="S2" value="1.959596632551949" />
+      <entry key="S5" value="1.983638425815153" />
+      <entry key="S10" value="1.9917854736865392" />
+      <entry key="S30" value="1.9977130309672242" />
+      <entry key="S60" value="2.099901249457858" />
+      <entry key="M2" value="3.520101097659067" />
+      <entry key="M5" value="9.801910552539265" />
+      <entry key="M10" value="15.918348120628496" />
+      <entry key="M15" value="19.861754019741994" />
+      <entry key="M30" value="34.11117727035793" />
+      <entry key="H1" value="74.2972466383569" />
+      <entry key="H2" value="137.53929767729178" />
+      <entry key="H4" value="198.19868928715064" />
+      <entry key="D1" value="276.1995236301905" />
+      <entry key="W1" value="293.0699524697056" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="6.909520615946465E-270" />
-      <entry key="S2" value="5.126984202134011E-68" />
-      <entry key="S5" value="1.2132346120760294E-27" />
-      <entry key="S10" value="3.483151751038174E-14" />
-      <entry key="S30" value="3.265809128393185E-5" />
-      <entry key="S60" value="0.005714725827538172" />
-      <entry key="M2" value="0.07559580562133174" />
-      <entry key="M5" value="0.35595826383760926" />
-      <entry key="M10" value="0.5966223795983597" />
-      <entry key="M15" value="0.7087064085866238" />
-      <entry key="M30" value="0.8418470220809858" />
-      <entry key="H1" value="0.9175222188486695" />
-      <entry key="H2" value="0.9578738011077814" />
-      <entry key="H4" value="0.9787102743446506" />
-      <entry key="D1" value="0.9964198207370936" />
-      <entry key="W1" value="0.9994877593197325" />
+      <entry key="MS500" value="5.858720476305332E-270" />
+      <entry key="S2" value="4.919836775514837E-68" />
+      <entry key="S5" value="1.1933841839669234E-27" />
+      <entry key="S10" value="3.454539309324651E-14" />
+      <entry key="S30" value="3.256842171947543E-5" />
+      <entry key="S60" value="0.005706874952149857" />
+      <entry key="M2" value="0.07554386111491691" />
+      <entry key="M5" value="0.35586040714242856" />
+      <entry key="M10" value="0.5965403650570752" />
+      <entry key="M15" value="0.7086414590029377" />
+      <entry key="M30" value="0.8418084455521563" />
+      <entry key="H1" value="0.9175011964854085" />
+      <entry key="H2" value="0.9578628275934966" />
+      <entry key="H4" value="0.978704668218915" />
+      <entry key="D1" value="0.9964188694735993" />
+      <entry key="W1" value="0.9994876230064771" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.047695600280017465" />
-      <entry key="MS500" value="0.5441212208354018" />
-      <entry key="S2" value="0.8588630441120515" />
-      <entry key="S5" value="0.9409565427474242" />
-      <entry key="S10" value="0.9700291453085046" />
-      <entry key="S30" value="0.9903976070996798" />
-      <entry key="S60" value="1.1017688114416053" />
-      <entry key="M2" value="2.5928409603662264" />
-      <entry key="M5" value="9.155056470583753" />
-      <entry key="M10" value="15.511389634952119" />
-      <entry key="M15" value="19.566337479194246" />
-      <entry key="M30" value="33.94865407808784" />
-      <entry key="H1" value="74.21005504261251" />
-      <entry key="H2" value="137.4926901131726" />
-      <entry key="H4" value="198.17408930360824" />
-      <entry key="D1" value="276.1951572854017" />
-      <entry key="W1" value="293.0693206210934" />
+      <entry key="MS100" value="0.4592079787015505" />
+      <entry key="MS500" value="1.309291210960047" />
+      <entry key="S2" value="1.7837587175051892" />
+      <entry key="S5" value="1.909199438283698" />
+      <entry key="S10" value="1.9538462890556065" />
+      <entry key="S30" value="1.9849325575665637" />
+      <entry key="S60" value="2.098881406948084" />
+      <entry key="M2" value="3.5903721944237343" />
+      <entry key="M5" value="10.152264738050643" />
+      <entry key="M10" value="16.509119901041377" />
+      <entry key="M15" value="20.564452671831088" />
+      <entry key="M30" value="34.94705260213528" />
+      <entry key="H1" value="75.20833182211115" />
+      <entry key="H2" value="138.49110352471854" />
+      <entry key="H4" value="199.1729484195109" />
+      <entry key="D1" value="277.194892652334" />
+      <entry key="W1" value="294.069280515003" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -92,31 +92,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.run.executor&quot;: &quot;Run&quot;,
-    &quot;Python.seed.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;angular-frontend&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/comfe/PycharmProjects/Shift Management System/shift-management-system&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.run.executor": "Run",
+    "Python.seed.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "angular-frontend",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/comfe/PycharmProjects/Shift Management System/shift-management-system",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\comfe\PycharmProjects\PythonProject\shift-management-system\app" />
