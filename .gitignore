@@ -30,7 +30,3 @@ Thumbs.db
 # Flask
 instance/
 
-# Angular / Node
-node_modules/
-dist/
-.angular/
