@@ -1,0 +1,25 @@
+<div class="modal">
+  <div class="modal-content">
+    <h3>{{ employee ? 'Employee Edit' : 'New Employee' }}</h3>
+    <form (ngSubmit)="onSubmit()">
+      <label>First-Last Name</label>
+      <input type="text" [(ngModel)]="fullName" name="fullName" required />
+
+      <label>Email</label>
+      <input type="email" [(ngModel)]="email" name="email" required />
+
+      <label>Phone Number</label>
+      <input type="text" [(ngModel)]="phone" name="phone" />
+
+      <label>Role</label>
+      <select [(ngModel)]="roleId" name="roleId" required>
+        <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
+      </select>
+
+      <div class="modal-actions">
+        <button type="submit">Save</button>
+        <button type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

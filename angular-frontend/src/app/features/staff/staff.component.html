@@ -1,0 +1,40 @@
+<div class="page-header">
+  <h2>Staff</h2>
+  <button (click)="openCreateModal()">+ New Employee</button>
+</div>
+
+<p *ngIf="loading">Loading...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<table *ngIf="!loading && !error" class="data-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Hiring Date</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let employee of employees">
+      <td>{{ employee.full_name }}</td>
+      <td>{{ employee.email }}</td>
+      <td>{{ employee.role }}</td>
+      <td>{{ employee.hire_date }}</td>
+      <td>{{ employee.is_active ? 'Active' : 'Inactive' }}</td>
+      <td>
+        <button (click)="openEditModal(employee)">Edit</button>
+        <button (click)="deleteEmployee(employee.id)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<app-employee-modal
+  *ngIf="showModal"
+  [employee]="editingEmployee"
+  (close)="onModalClose()"
+  (saved)="onModalSaved()"
+></app-employee-modal>
