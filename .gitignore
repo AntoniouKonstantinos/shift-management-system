@@ -30,5 +30,5 @@ Thumbs.db
 # Flask
 instance/
 
-*/__pychache__/
+*/__pycache__/
 
