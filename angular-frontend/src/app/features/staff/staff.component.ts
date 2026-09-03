@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Employee } from '../../core/models/employee.model';
 import { EmployeeService } from '../../core/services/employee.service';
@@ -12,9 +12,12 @@ import { EmployeeModalComponent } from './employee-modal/employee-modal.componen
   styleUrl: './staff.component.css',
 })
 export class StaffComponent implements OnInit {
-  employees: Employee[] = [];
-  loading = true;
-  error: string | null = null;
+  employees = signal<Employee[]>([]);
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
+
+  showModal = signal<boolean>(false);
+  editingEmployee = signal<Employee | null>(null);
 
   constructor(private employeeService: EmployeeService) {}
 
@@ -23,15 +26,15 @@ export class StaffComponent implements OnInit {
   }
 
   loadEmployees(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.employeeService.list().subscribe({
       next: (data) => {
-        this.employees = data;
-        this.loading = false;
+        this.employees.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
-        this.error = 'Failed to load employees.';
-        this.loading = false;
+        this.error.set('Failed to load employees.');
+        this.loading.set(false);
         console.error(err);
       },
     });
@@ -51,25 +54,22 @@ export class StaffComponent implements OnInit {
     });
   }
 
-  showModal = false;
-  editingEmployee: Employee | null = null;
-
   openCreateModal(): void {
-    this.editingEmployee = null;
-    this.showModal = true;
+    this.editingEmployee.set(null);
+    this.showModal.set(true);
   }
 
   openEditModal(employee: Employee): void {
-    this.editingEmployee = employee;
-    this.showModal = true;
+    this.editingEmployee.set(employee);
+    this.showModal.set(true);
   }
 
   onModalClose(): void {
-    this.showModal = false;
+    this.showModal.set(false);
   }
 
   onModalSaved(): void {
-    this.showModal = false;
+    this.showModal.set(false);
     this.loadEmployees();
   }
 }

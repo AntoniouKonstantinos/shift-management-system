@@ -3,10 +3,10 @@
   <button (click)="openCreateModal()">+ New Employee</button>
 </div>
 
-<p *ngIf="loading">Loading...</p>
-<p *ngIf="error" class="error">{{ error }}</p>
+<p *ngIf="loading()">Loading...</p>
+<p *ngIf="error()" class="error">{{ error() }}</p>
 
-<table *ngIf="!loading && !error" class="data-table">
+<table *ngIf="!loading() && !error()" class="data-table">
   <thead>
     <tr>
       <th>Name</th>
@@ -18,7 +18,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let employee of employees">
+    <tr *ngFor="let employee of employees()">
       <td>{{ employee.full_name }}</td>
       <td>{{ employee.email }}</td>
       <td>{{ employee.role }}</td>
@@ -33,8 +33,8 @@
 </table>
 
 <app-employee-modal
-  *ngIf="showModal"
-  [employee]="editingEmployee"
+  *ngIf="showModal()"
+  [employee]="editingEmployee()"
   (close)="onModalClose()"
   (saved)="onModalSaved()"
 ></app-employee-modal>

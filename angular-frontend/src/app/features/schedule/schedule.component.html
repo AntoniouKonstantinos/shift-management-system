@@ -1,13 +1,13 @@
 <div class="dashboard-header">
   <button (click)="previousWeek()">« Previous</button>
-  <h2>{{ weekLabel }}</h2>
+  <h2>{{ weekLabel() }}</h2>
   <button (click)="nextWeek()">Next »</button>
 </div>
 
-<p *ngIf="loading">Loading...</p>
+<p *ngIf="loading()">Loading...</p>
 
-<div *ngIf="!loading" class="calendar-grid">
-  <div class="day-column" *ngFor="let day of days">
+<div *ngIf="!loading()" class="calendar-grid">
+  <div class="day-column" *ngFor="let day of days()">
     <h4>{{ day.date }}</h4>
 
     <div class="shift-card" *ngFor="let shift of day.shifts">

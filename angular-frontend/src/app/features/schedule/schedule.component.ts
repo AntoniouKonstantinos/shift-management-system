@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Shift } from '../../core/models/shift.model';
 import { ShiftService } from '../../core/services/shift.service';
@@ -16,22 +16,22 @@ interface DayColumn {
   styleUrl: './schedule.component.css',
 })
 export class ScheduleComponent implements OnInit {
-  currentWeekStart: Date = this.getMonday(new Date());
-  days: DayColumn[] = [];
-  loading = true;
+  currentWeekStart = signal<Date>(this.getMonday(new Date()));
+  days = signal<DayColumn[]>([]);
+  loading = signal<boolean>(true);
+  activeShiftId = signal<number | null>(null);
 
-  activeShiftId: number | null = null;
+  weekLabel = computed(() => {
+    const start = this.currentWeekStart();
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    return `${this.formatDate(start)} — ${this.formatDate(end)}`;
+  });
 
   constructor(private shiftService: ShiftService) {}
 
   ngOnInit(): void {
     this.loadWeek();
-  }
-
-  get weekLabel(): string {
-    const end = new Date(this.currentWeekStart);
-    end.setDate(end.getDate() + 6);
-    return `${this.formatDate(this.currentWeekStart)} — ${this.formatDate(end)}`;
   }
 
   previousWeek(): void {
@@ -43,29 +43,28 @@ export class ScheduleComponent implements OnInit {
   }
 
   private shiftWeek(deltaDays: number): void {
-    const next = new Date(this.currentWeekStart);
+    const next = new Date(this.currentWeekStart());
     next.setDate(next.getDate() + deltaDays);
-    this.currentWeekStart = next;
+    this.currentWeekStart.set(next);
     this.loadWeek();
   }
 
   private loadWeek(): void {
-    this.loading = true;
-    const weekEnd = new Date(this.currentWeekStart);
+    this.loading.set(true);
+    const start = this.currentWeekStart();
+    const weekEnd = new Date(start);
     weekEnd.setDate(weekEnd.getDate() + 6);
 
-    this.shiftService
-      .list(this.formatDate(this.currentWeekStart), this.formatDate(weekEnd))
-      .subscribe({
-        next: (shifts) => {
-          this.days = this.groupByDay(shifts);
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error(err);
-          this.loading = false;
-        },
-      });
+    this.shiftService.list(this.formatDate(start), this.formatDate(weekEnd)).subscribe({
+      next: (shifts) => {
+        this.days.set(this.groupByDay(shifts));
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading.set(false);
+      },
+    });
   }
 
   private groupByDay(shifts: Shift[]): DayColumn[] {
@@ -75,9 +74,10 @@ export class ScheduleComponent implements OnInit {
       byDate[shift.shift_date].push(shift);
     }
 
+    const start = this.currentWeekStart();
     const columns: DayColumn[] = [];
     for (let i = 0; i < 7; i++) {
-      const day = new Date(this.currentWeekStart);
+      const day = new Date(start);
       day.setDate(day.getDate() + i);
       const dateStr = this.formatDate(day);
       columns.push({ date: dateStr, shifts: byDate[dateStr] ?? [] });
@@ -99,15 +99,15 @@ export class ScheduleComponent implements OnInit {
   }
 
   openAssignModal(shiftId: number): void {
-    this.activeShiftId = shiftId;
+    this.activeShiftId.set(shiftId);
   }
 
   onAssignModalClose(): void {
-    this.activeShiftId = null;
+    this.activeShiftId.set(null);
   }
 
   onAssignModalSaved(): void {
-    this.activeShiftId = null;
+    this.activeShiftId.set(null);
     this.loadWeek();
   }
 }
