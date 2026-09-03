@@ -1,0 +1,20 @@
+<div class="dashboard-header">
+  <button (click)="previousWeek()">« Previous</button>
+  <h2>{{ weekLabel }}</h2>
+  <button (click)="nextWeek()">Next »</button>
+</div>
+
+<p *ngIf="loading">Loading...</p>
+
+<div *ngIf="!loading" class="calendar-grid">
+  <div class="day-column" *ngFor="let day of days">
+    <h4>{{ day.date }}</h4>
+
+    <div class="shift-card" *ngFor="let shift of day.shifts">
+      <strong>{{ shift.department }}</strong><br />
+      {{ shift.start_time }}–{{ shift.end_time }}<br />
+      {{ shift.assigned_count }}/{{ shift.required_staff }} Covered
+      <button (click)="openAssignModal(shift.id)">+ Assign</button>
+    </div>
+  </div>
+</div>
