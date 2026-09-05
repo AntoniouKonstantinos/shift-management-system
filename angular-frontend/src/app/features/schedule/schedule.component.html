@@ -18,3 +18,10 @@
     </div>
   </div>
 </div>
+
+<app-assign-modal
+  *ngIf="activeShiftId() !== null"
+  [shiftId]="activeShiftId()!"
+  (close)="onAssignModalClose()"
+  (saved)="onAssignModalSaved()"
+></app-assign-modal>

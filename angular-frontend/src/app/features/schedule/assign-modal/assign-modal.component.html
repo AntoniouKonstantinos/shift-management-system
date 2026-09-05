@@ -1,0 +1,23 @@
+<div class="modal">
+  <div class="modal-content">
+    <h3>Employee Assignment</h3>
+
+    <p *ngIf="loading()">Loading candidates...</p>
+    <p *ngIf="error()" class="error">{{ error() }}</p>
+
+    <ng-container *ngIf="!loading() && !error()">
+      <p *ngIf="candidates().length === 0">No eligible employees for this shift.</p>
+
+      <select *ngIf="candidates().length > 0" [(ngModel)]="selectedEmployeeId" name="employee">
+        <option *ngFor="let candidate of candidates()" [ngValue]="candidate.id">
+          {{ candidate.full_name }} ({{ candidate.role }})
+        </option>
+      </select>
+    </ng-container>
+
+    <div class="modal-actions">
+      <button (click)="onAssign()" [disabled]="candidates().length === 0">Assign</button>
+      <button (click)="onCancel()">Cancel</button>
+    </div>
+  </div>
+</div>

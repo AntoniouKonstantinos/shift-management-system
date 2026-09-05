@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Shift } from '../../core/models/shift.model';
 import { ShiftService } from '../../core/services/shift.service';
+import { AssignModalComponent } from './assign-modal/assign-modal.component';
 
 interface DayColumn {
   date: string;
@@ -11,7 +12,7 @@ interface DayColumn {
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AssignModalComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css',
 })
