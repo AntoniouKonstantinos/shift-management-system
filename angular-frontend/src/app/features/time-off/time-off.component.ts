@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimeOffRequest } from '../../core/models/time-off-request.model';
 import { TimeOffService } from '../../core/services/time-off.service';
+import { RequestModalComponent } from './request-modal/request-modal.component';
 
 @Component({
   selector: 'app-time-off',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RequestModalComponent],
   templateUrl: './time-off.component.html',
   styleUrl: './time-off.component.css',
 })
+
 export class TimeOffComponent implements OnInit {
   requests = signal<TimeOffRequest[]>([]);
   loading = signal<boolean>(true);

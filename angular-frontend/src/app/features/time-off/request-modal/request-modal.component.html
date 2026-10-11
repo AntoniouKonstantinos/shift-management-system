@@ -1,0 +1,27 @@
+<div class="modal">
+  <div class="modal-content">
+    <h3>New Time-off Request</h3>
+    <form (ngSubmit)="onSubmit()">
+      <label>Employee</label>
+      <select [(ngModel)]="employeeId" name="employeeId" required>
+        <option *ngFor="let employee of employees()" [ngValue]="employee.id">
+          {{ employee.full_name }}
+        </option>
+      </select>
+
+      <label>Start Date</label>
+      <input type="date" [(ngModel)]="startDate" name="startDate" required />
+
+      <label>End Date</label>
+      <input type="date" [(ngModel)]="endDate" name="endDate" required />
+
+      <label>Reason</label>
+      <input type="text" [(ngModel)]="reason" name="reason" />
+
+      <div class="modal-actions">
+        <button type="submit">Submit</button>
+        <button type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
