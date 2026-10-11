@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h2>Time-off Requests</h2>
+  <button (click)="openCreateModal()">+ New Request</button>
+</div>
+
+<div class="filter-bar">
+  <label>Status:</label>
+  <select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
+    <option value="">All</option>
+    <option value="pending">Pending</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Rejected</option>
+  </select>
+</div>
+
+<p *ngIf="loading()">Loading...</p>
+<p *ngIf="error()" class="error">{{ error() }}</p>
+
+<table *ngIf="!loading() && !error()" class="data-table">
+  <thead>
+    <tr>
+      <th>Employee</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Reason</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let request of requests()">
+      <td>{{ request.employee_name }}</td>
+      <td>{{ request.start_date }}</td>
+      <td>{{ request.end_date }}</td>
+      <td>{{ request.reason || '—' }}</td>
+      <td>
+        <span class="status-badge" [ngClass]="'status-' + request.status">
+          {{ statusLabel(request.status) }}
+        </span>
+      </td>
+      <td>
+        <ng-container *ngIf="request.status === 'pending'; else decided">
+          <button class="approve-btn" (click)="approve(request.id)">Approve</button>
+          <button class="reject-btn" (click)="reject(request.id)">Reject</button>
+        </ng-container>
+        <ng-template #decided>
+          <button class="delete-btn" (click)="deleteRequest(request.id)">Delete</button>
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+</table>
