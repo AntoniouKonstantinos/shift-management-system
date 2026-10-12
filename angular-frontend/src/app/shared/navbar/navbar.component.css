@@ -1,0 +1,29 @@
+.navbar {
+  display: flex;
+  gap: 24px;
+  padding: 16px 24px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+}
+
+.nav-link.active {
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    gap: 16px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+}
