@@ -25,9 +25,6 @@ def create_app(config_name="default"):
     app.register_blueprint(time_off_bp)
     app.register_blueprint(roles_bp)
 
-    from app.routes.views import bp as views_bp
-    app.register_blueprint(views_bp)
-
     with app.app_context():
         from app import models
         db.create_all()
