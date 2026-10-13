@@ -3,11 +3,21 @@
 A staff shift scheduling application built for restaurant and hospitality
 businesses. Managers can create shifts, track employee availability, assign
 staff based on real-time eligibility checks, and manage time-off requests —
-all through a lightweight web dashboard.
+all through a single-page web dashboard.
 
 Built as a portfolio project with an emphasis on correct relational database
 design and CRUD logic on top of real business rules, drawing on direct
 industry experience in hospitality.
+
+## Branches
+
+| Branch | Frontend |
+|---|---|
+| `main` | Original version: Jinja2 templates + vanilla JavaScript, served by Flask |
+| `angular-frontend` | This version: Angular single-page app consuming the Flask REST API |
+
+The backend is identical in both branches. In this branch Flask is a pure
+JSON API and serves no HTML pages.
 
 ## Features
 
@@ -38,11 +48,13 @@ industry experience in hospitality.
 
 ## Tech Stack
 
-- **Backend:** Flask, Flask-SQLAlchemy
+- **Backend:** Flask, Flask-SQLAlchemy (REST API only)
 - **Database:** SQLite (swappable via `DATABASE_URL`)
-- **Frontend:** vanilla JavaScript, Jinja2 templates, plain CSS
+- **Frontend:** Angular (standalone components, signals, `HttpClient`,
+  client-side routing), TypeScript, plain CSS
 - **Architecture:** Flask application factory pattern with resource-based
-  blueprints
+  blueprints; Angular feature folders with a typed service layer; the
+  Angular dev server proxies `/api` requests to Flask
 
 ## Database Design
 
@@ -67,32 +79,34 @@ tracking) beyond simple linking.
 
 ```
 shift-management-system/
-├── app/
-│   ├── __init__.py          # application factory, blueprint registration
-│   ├── models.py            # SQLAlchemy models
-│   ├── scheduler.py         # eligibility/matching logic
-│   ├── routes/
-│   │   ├── employees.py
-│   │   ├── shifts.py
-│   │   ├── assignments.py
-│   │   ├── availability.py
-│   │   ├── time_off.py
-│   │   ├── roles.py
-│   │   └── views.py
-│   ├── static/
-│   │   ├── css/style.css
-│   │   └── js/
-│   │       ├── api.js
-│   │       ├── calendar.js
-│   │       ├── employees.js
-│   │       └── time_off.js
-│   └── templates/
-│       ├── base.html
-│       ├── dashboard.html
-│       ├── employees.html
-│       └── time_off.html
+├── app/                          # Flask backend (API only)
+│   ├── __init__.py               # application factory, blueprint registration
+│   ├── models.py                 # SQLAlchemy models
+│   ├── scheduler.py              # eligibility/matching logic
+│   └── routes/
+│       ├── employees.py
+│       ├── shifts.py
+│       ├── assignments.py
+│       ├── availability.py
+│       ├── time_off.py
+│       └── roles.py
+├── angular-frontend/             # Angular single-page app
+│   ├── proxy.conf.json           # forwards /api to Flask during development
+│   └── src/app/
+│       ├── core/
+│       │   ├── models/           # TypeScript interfaces matching API responses
+│       │   └── services/         # one HttpClient service per resource
+│       ├── features/
+│       │   ├── schedule/         # weekly calendar + assign modal
+│       │   ├── staff/            # staff table + create/edit modal
+│       │   └── time-off/         # requests table + new-request modal
+│       ├── shared/
+│       │   └── navbar/
+│       └── app.routes.ts
+├── screenshots/
 ├── config.py
 ├── run.py
+├── seed.py
 ├── requirements.txt
 └── .gitignore
 ```
@@ -110,23 +124,41 @@ shift-management-system/
 
 ## Getting Started
 
-```bash
-# 1. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+**Prerequisites:** Python 3, Node.js, and the Angular CLI
+(`npm install -g @angular/cli`).
 
-# 2. Install dependencies
+**1. Backend**
+
+```bash
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# 3. (Optional) Populate the database with sample data
+# (Optional) Populate the database with sample data
 python seed.py
 
-# 4. Run the app
+# Run the API (http://127.0.0.1:5000)
 python run.py
 ```
 
-The app starts at `http://127.0.0.1:5000` and creates a local SQLite database
-on first run.
+**2. Frontend** (in a second terminal)
+
+```bash
+cd angular-frontend
+npm install
+ng serve
+```
+
+Open `http://localhost:4200`. The Angular dev server forwards every `/api`
+request to the Flask server on port 5000, so both must be running.
+
+## Known Limitations
+
+- Shifts and availability windows that cross midnight (e.g. 22:00–03:00)
+  are not supported by the current time-comparison logic.
 
 ## Author
 
