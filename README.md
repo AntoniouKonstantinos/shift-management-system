@@ -9,15 +9,13 @@ Built as a portfolio project with an emphasis on correct relational database
 design and CRUD logic on top of real business rules, drawing on direct
 industry experience in hospitality.
 
-## Branches
+## Version History
 
-| Branch | Frontend |
-|---|---|
-| `main` | Original version: Jinja2 templates + vanilla JavaScript, served by Flask |
-| `angular-frontend` | This version: Angular single-page app consuming the Flask REST API |
-
-The backend is identical in both branches. In this branch Flask is a pure
-JSON API and serves no HTML pages.
+The frontend was originally built with Jinja2 templates and vanilla
+JavaScript served by Flask, then rewritten as an Angular single-page app on
+top of the same backend. The original version is preserved under the
+[`v1-vanilla-js`](https://github.com/AntoniouKonstantinos/shift-management-system/tree/v1-vanilla-js)
+tag. Flask is now a pure JSON API and serves no HTML pages.
 
 ## Features
 
