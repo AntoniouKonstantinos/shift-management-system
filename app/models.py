@@ -121,7 +121,7 @@ class ShiftAssignment(db.Model):
 
 
 class Availability(db.Model):
-    """Επαναλαμβανόμενη διαθεσιμότητα ανά ημέρα εβδομάδας (0=Δευτέρα ... 6=Κυριακή)."""
+    """Recurring availability per day of the week (0=Monday ... 6=Sunday)."""
     __tablename__ = "availabilities"
 
     id = db.Column(db.Integer, primary_key=True)
