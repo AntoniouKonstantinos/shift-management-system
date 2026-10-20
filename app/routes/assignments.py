@@ -1,7 +1,9 @@
-from flask import Blueprint, request, jsonify
+from datetime import datetime
+from flask import Blueprint, request, jsonify, g
 from app import db
 from app.models import ShiftAssignment, Shift, Employee
 from app.scheduler import get_available_employees, _is_available, _has_conflict, _is_on_time_off
+from app.security import login_required, manager_required
 
 bp = Blueprint("assignments", __name__, url_prefix="/api")
 
@@ -9,16 +11,18 @@ VALID_STATUSES = {"assigned", "confirmed", "completed", "no_show"}
 
 
 @bp.route("/shifts/<int:shift_id>/candidates", methods=["GET"])
+@manager_required
 def list_candidates(shift_id):
     Shift.query.get_or_404(shift_id)
     candidates = get_available_employees(shift_id)
     return jsonify([
-        {"id": can.id, "full_name": can.full_name, "role": can.role.name}
-        for can in candidates
+        {"id": e.id, "full_name": e.full_name, "role": e.role.name}
+        for e in candidates
     ]), 200
 
 
 @bp.route("/shifts/<int:shift_id>/assign", methods=["POST"])
+@manager_required
 def assign_employee(shift_id):
     shift = Shift.query.get_or_404(shift_id)
     data = request.get_json()
@@ -58,10 +62,11 @@ def assign_employee(shift_id):
     db.session.add(assignment)
     db.session.commit()
 
-    return jsonify(convert_to_dict(assignment)), 201
+    return jsonify(_serialize(assignment)), 201
 
 
 @bp.route("/assignments/<int:assignment_id>", methods=["PATCH"])
+@manager_required
 def update_assignment_status(assignment_id):
     assignment = ShiftAssignment.query.get_or_404(assignment_id)
     data = request.get_json()
@@ -72,26 +77,29 @@ def update_assignment_status(assignment_id):
 
     assignment.status = new_status
 
-    from datetime import datetime
-    if new_status == "confirmed" and not assignment.check_in:
-        pass  # check-in is done separately, not automatically at confirm
     if new_status == "completed":
         assignment.check_out = datetime.utcnow()
 
     db.session.commit()
-    return jsonify(convert_to_dict(assignment)), 200
+    return jsonify(_serialize(assignment)), 200
 
 
 @bp.route("/assignments/<int:assignment_id>/check-in", methods=["PATCH"])
+@login_required
 def check_in(assignment_id):
     assignment = ShiftAssignment.query.get_or_404(assignment_id)
-    from datetime import datetime
+    account = g.current_account
+
+    if not account.is_manager and assignment.employee_id != account.employee_id:
+        return jsonify({"error": "You can only check in to your own shifts"}), 403
+
     assignment.check_in = datetime.utcnow()
     db.session.commit()
-    return jsonify(convert_to_dict(assignment)), 200
+    return jsonify(_serialize(assignment)), 200
 
 
 @bp.route("/assignments/<int:assignment_id>", methods=["DELETE"])
+@manager_required
 def remove_assignment(assignment_id):
     assignment = ShiftAssignment.query.get_or_404(assignment_id)
     db.session.delete(assignment)
@@ -99,7 +107,7 @@ def remove_assignment(assignment_id):
     return "", 204
 
 
-def convert_to_dict(assignment):
+def _serialize(assignment):
     return {
         "id": assignment.id,
         "employee_id": assignment.employee_id,
