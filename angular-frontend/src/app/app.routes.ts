@@ -2,8 +2,10 @@ import { Routes } from '@angular/router';
 import { ScheduleComponent } from './features/schedule/schedule.component';
 import { StaffComponent } from './features/staff/staff.component';
 import { TimeOffComponent } from './features/time-off/time-off.component';
+import { LoginComponent } from './features/login/login.component';
 
 export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
   { path: '', component: ScheduleComponent },
   { path: 'staff', component: StaffComponent },
   { path: 'time-off', component: TimeOffComponent },
