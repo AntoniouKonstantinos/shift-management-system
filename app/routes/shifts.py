@@ -2,11 +2,13 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from app import db
 from app.models import Shift, Department
+from app.security import login_required, manager_required
 
 bp = Blueprint("shifts", __name__, url_prefix="/api/shifts")
 
 
 @bp.route("", methods=["GET"])
+@login_required
 def list_shifts():
     query = Shift.query
 
@@ -22,16 +24,18 @@ def list_shifts():
         query = query.filter(Shift.shift_date <= _parse_date(date_to))
 
     shifts = query.order_by(Shift.shift_date, Shift.start_time).all()
-    return jsonify([convert_to_dict(sh) for sh in shifts]), 200
+    return jsonify([_serialize(s) for s in shifts]), 200
 
 
 @bp.route("/<int:shift_id>", methods=["GET"])
+@login_required
 def get_shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
-    return jsonify(convert_to_dict(shift, include_assignments=True)), 200
+    return jsonify(_serialize(shift, include_assignments=True)), 200
 
 
 @bp.route("", methods=["POST"])
+@manager_required
 def create_shift():
     data = request.get_json()
 
@@ -48,7 +52,7 @@ def create_shift():
     end_time = _parse_time(data["end_time"])
 
     if start_time >= end_time:
-        return jsonify({"error": "Start time must be before end time"}), 400
+        return jsonify({"error": "start_time must be before end_time"}), 400
 
     shift = Shift(
         department_id=data["department_id"],
@@ -61,10 +65,11 @@ def create_shift():
     db.session.add(shift)
     db.session.commit()
 
-    return jsonify(convert_to_dict(shift)), 201
+    return jsonify(_serialize(shift)), 201
 
 
 @bp.route("/<int:shift_id>", methods=["PUT"])
+@manager_required
 def update_shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
     data = request.get_json()
@@ -88,10 +93,11 @@ def update_shift(shift_id):
     shift.notes = data.get("notes", shift.notes)
 
     db.session.commit()
-    return jsonify(convert_to_dict(shift)), 200
+    return jsonify(_serialize(shift)), 200
 
 
 @bp.route("/<int:shift_id>", methods=["DELETE"])
+@manager_required
 def delete_shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
     db.session.delete(shift)
@@ -107,7 +113,7 @@ def _parse_time(value):
     return datetime.strptime(value, "%H:%M").time()
 
 
-def convert_to_dict(shift, include_assignments=False):
+def _serialize(shift, include_assignments=False):
     data = {
         "id": shift.id,
         "department": shift.department.name,
@@ -121,10 +127,10 @@ def convert_to_dict(shift, include_assignments=False):
     if include_assignments:
         data["assignments"] = [
             {
-                "id": s_a.id,
-                "employee": s_a.employee.full_name,
-                "status": s_a.status,
+                "id": a.id,
+                "employee": a.employee.full_name,
+                "status": a.status,
             }
-            for s_a in shift.assignments
+            for a in shift.assignments
         ]
     return data
