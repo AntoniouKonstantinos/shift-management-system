@@ -1,11 +1,25 @@
-<nav class="navbar">
-  <a
-    routerLink="/"
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{ exact: true }"
-    class="nav-link"
-    >Schedule</a
-  >
-  <a routerLink="/staff" routerLinkActive="active" class="nav-link">Staff</a>
-  <a routerLink="/time-off" routerLinkActive="active" class="nav-link">Time-Off</a>
+<nav class="navbar" *ngIf="auth.isLoggedIn()">
+  <div class="nav-links">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-link"
+      >Schedule</a
+    >
+    <a
+      *ngIf="auth.isManager()"
+      routerLink="/staff"
+      routerLinkActive="active"
+      class="nav-link"
+      >Staff</a
+    >
+    <a routerLink="/time-off" routerLinkActive="active" class="nav-link">Time-Off</a>
+  </div>
+
+  <div class="nav-user" *ngIf="auth.currentUser() as user">
+    <span class="user-name">{{ user.full_name }}</span>
+    <span class="user-badge">{{ user.access_level }}</span>
+    <button type="button" class="logout-btn" (click)="auth.logout()">Log out</button>
+  </div>
 </nav>
