@@ -1,8 +1,21 @@
 from datetime import date, time, timedelta
 from app import create_app, db
-from app.models import Role, Department, Employee, Shift, Availability
+from app.models import (
+    Role, Department, Employee, UserAccount, Shift, Availability,
+    ACCESS_MANAGER, ACCESS_EMPLOYEE,
+)
+
+MANAGER_PASSWORD = "manager123"
+EMPLOYEE_PASSWORD = "employee123"
 
 app = create_app()
+
+
+def add_account(employee, password, access_level):
+    account = UserAccount(employee=employee, access_level=access_level)
+    account.set_password(password)
+    db.session.add(account)
+
 
 with app.app_context():
     db.drop_all()
@@ -13,7 +26,8 @@ with app.app_context():
     chef = Role(name="Chef", hourly_rate=9.0)
     bartender = Role(name="Bartender", hourly_rate=7.5)
     host = Role(name="Host", hourly_rate=6.0)
-    db.session.add_all([waiter, chef, bartender, host])
+    manager_role = Role(name="Manager", hourly_rate=11.0)
+    db.session.add_all([waiter, chef, bartender, host, manager_role])
     db.session.commit()
 
     # Departments
@@ -24,13 +38,22 @@ with app.app_context():
     db.session.commit()
 
     # Employees
+    anna = Employee(full_name="Anna Vasileiou", email="manager@example.com",
+                    role_id=manager_role.id, hire_date=date(2021, 9, 1))
     maria = Employee(full_name="Maria Papadopoulou", email="maria@example.com",
-                      role_id=waiter.id, hire_date=date(2023, 3, 1))
+                     role_id=waiter.id, hire_date=date(2023, 3, 1))
     nikos = Employee(full_name="Nikos Georgiou", email="nikos@example.com",
-                      role_id=chef.id, hire_date=date(2022, 6, 15))
+                     role_id=chef.id, hire_date=date(2022, 6, 15))
     elena = Employee(full_name="Elena Ioannou", email="elena@example.com",
-                      role_id=bartender.id, hire_date=date(2024, 1, 10))
-    db.session.add_all([maria, nikos, elena])
+                     role_id=bartender.id, hire_date=date(2024, 1, 10))
+    db.session.add_all([anna, maria, nikos, elena])
+    db.session.commit()
+
+    # Accounts
+    add_account(anna, MANAGER_PASSWORD, ACCESS_MANAGER)
+    add_account(maria, EMPLOYEE_PASSWORD, ACCESS_EMPLOYEE)
+    add_account(nikos, EMPLOYEE_PASSWORD, ACCESS_EMPLOYEE)
+    add_account(elena, EMPLOYEE_PASSWORD, ACCESS_EMPLOYEE)
     db.session.commit()
 
     # Availability — Maria: Mon-Fri evenings
@@ -47,7 +70,7 @@ with app.app_context():
             start_time=time(10, 0), end_time=time(23, 0)
         ))
 
-    # Availability — Elena: weekends only, no midnight wraparound
+    # Availability — Elena: Friday to Sunday, no midnight wraparound
     db.session.add(Availability(
         employee_id=elena.id, day_of_week=4,
         start_time=time(16, 0), end_time=time(23, 59)
@@ -78,4 +101,10 @@ with app.app_context():
 
     db.session.commit()
 
-    print("Seed complete: 4 roles, 3 departments, 3 employees, availability, 14 shifts.")
+    print("Seed complete: 5 roles, 3 departments, 4 employees, 4 accounts, availability, 14 shifts.")
+    print()
+    print("Demo logins (local development only):")
+    print(f"  manager   manager@example.com   / {MANAGER_PASSWORD}")
+    print(f"  employee  maria@example.com     / {EMPLOYEE_PASSWORD}")
+    print(f"  employee  nikos@example.com     / {EMPLOYEE_PASSWORD}")
+    print(f"  employee  elena@example.com     / {EMPLOYEE_PASSWORD}")
