@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Shift } from '../../core/models/shift.model';
 import { ShiftService } from '../../core/services/shift.service';
 import { AssignModalComponent } from './assign-modal/assign-modal.component';
+import { AuthService } from '../../core/services/auth.service';
 
 interface DayColumn {
   date: string;
@@ -29,7 +30,10 @@ export class ScheduleComponent implements OnInit {
     return `${this.formatDate(start)} — ${this.formatDate(end)}`;
   });
 
-  constructor(private shiftService: ShiftService) {}
+  constructor(
+    private shiftService: ShiftService,
+    public auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.loadWeek();
