@@ -1,5 +1,5 @@
 <div class="page-header">
-  <h2>Time-off Requests</h2>
+  <h2>{{ auth.isManager() ? 'Time-off Requests' : 'My Time-off Requests' }}</h2>
   <button (click)="openCreateModal()">+ New Request</button>
 </div>
 
@@ -39,13 +39,23 @@
         </span>
       </td>
       <td>
-        <ng-container *ngIf="request.status === 'pending'; else decided">
-          <button class="approve-btn" (click)="approve(request.id)">Approve</button>
-          <button class="reject-btn" (click)="reject(request.id)">Reject</button>
+        <ng-container *ngIf="auth.isManager()">
+          <ng-container *ngIf="request.status === 'pending'; else decided">
+            <button class="approve-btn" (click)="approve(request.id)">Approve</button>
+            <button class="reject-btn" (click)="reject(request.id)">Reject</button>
+          </ng-container>
+          <ng-template #decided>
+            <button class="delete-btn" (click)="deleteRequest(request.id)">Delete</button>
+          </ng-template>
         </ng-container>
-        <ng-template #decided>
-          <button class="delete-btn" (click)="deleteRequest(request.id)">Delete</button>
-        </ng-template>
+
+        <button
+          *ngIf="!auth.isManager() && request.status === 'pending'"
+          class="delete-btn"
+          (click)="deleteRequest(request.id, 'Withdraw this request?')"
+        >
+          Withdraw
+        </button>
       </td>
     </tr>
   </tbody>

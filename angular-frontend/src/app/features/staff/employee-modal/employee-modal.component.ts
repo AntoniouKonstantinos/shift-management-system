@@ -2,17 +2,21 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output,
-  OnInit,
   OnChanges,
+  OnInit,
+  Output,
   SimpleChanges,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AccessLevel } from '../../../core/models/auth.model';
 import { Employee, EmployeeCreate, EmployeeUpdate } from '../../../core/models/employee.model';
 import { Role } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { EmployeeService } from '../../../core/services/employee.service';
+
+const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-employee-modal',
@@ -26,22 +30,31 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
-  roles: Role[] = [];
+  roles = signal<Role[]>([]);
 
-  fullName = '';
-  email = '';
-  phone = '';
-  roleId: number | null = null;
+  fullName = signal<string>('');
+  email = signal<string>('');
+  phone = signal<string>('');
+  roleId = signal<number | null>(null);
+  password = signal<string>('');
+  accessLevel = signal<AccessLevel>('employee');
 
   constructor(
     private roleService: RoleService,
     private employeeService: EmployeeService,
   ) {}
 
+  get hasAccount(): boolean {
+    return !!this.employee?.has_account;
+  }
+
   ngOnInit(): void {
     this.roleService.list().subscribe({
-      next: (data: Role[]) => (this.roles = data),
-      error: (err: any) => console.error(err),
+      next: (data) => {
+        this.roles.set(data);
+        this.matchRole();
+      },
+      error: (err) => console.error(err),
     });
   }
 
@@ -52,32 +65,59 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
   }
 
   private resetForm(): void {
+    this.password.set('');
+    this.roleId.set(null);
+
     if (this.employee) {
-      this.fullName = this.employee.full_name;
-      this.email = this.employee.email;
-      this.phone = this.employee.phone ?? '';
-      const matchedRole = this.roles.find((r) => r.name === this.employee!.role);
-      this.roleId = matchedRole ? matchedRole.id : null;
+      this.fullName.set(this.employee.full_name);
+      this.email.set(this.employee.email);
+      this.phone.set(this.employee.phone ?? '');
+      this.accessLevel.set(this.employee.access_level ?? 'employee');
+      this.matchRole();
     } else {
-      this.fullName = '';
-      this.email = '';
-      this.phone = '';
-      this.roleId = null;
+      this.fullName.set('');
+      this.email.set('');
+      this.phone.set('');
+      this.accessLevel.set('employee');
+    }
+  }
+
+  private matchRole(): void {
+    if (!this.employee || this.roleId() !== null) {
+      return;
+    }
+    const match = this.roles().find((r) => r.name === this.employee!.role);
+    if (match) {
+      this.roleId.set(match.id);
     }
   }
 
   onSubmit(): void {
-    if (!this.roleId) {
+    const roleId = this.roleId();
+    if (!roleId) {
       alert('Please select a role.');
       return;
     }
 
+    const password = this.password();
+    if (password && password.length < MIN_PASSWORD_LENGTH) {
+      alert(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      return;
+    }
+
+    const includeAccessLevel = this.hasAccount || !!password;
+    const accountFields = {
+      ...(password ? { password } : {}),
+      ...(includeAccessLevel ? { access_level: this.accessLevel() } : {}),
+    };
+
     if (this.employee) {
       const payload: EmployeeUpdate = {
-        full_name: this.fullName,
-        email: this.email,
-        phone: this.phone || null,
-        role_id: this.roleId,
+        full_name: this.fullName(),
+        email: this.email(),
+        phone: this.phone() || null,
+        role_id: roleId,
+        ...accountFields,
       };
       this.employeeService.update(this.employee.id, payload).subscribe({
         next: () => this.saved.emit(),
@@ -85,10 +125,11 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
       });
     } else {
       const payload: EmployeeCreate = {
-        full_name: this.fullName,
-        email: this.email,
-        phone: this.phone || null,
-        role_id: this.roleId,
+        full_name: this.fullName(),
+        email: this.email(),
+        phone: this.phone() || null,
+        role_id: roleId,
+        ...accountFields,
       };
       this.employeeService.create(payload).subscribe({
         next: () => this.saved.emit(),

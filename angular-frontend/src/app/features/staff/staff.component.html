@@ -14,6 +14,7 @@
       <th>Role</th>
       <th>Hiring Date</th>
       <th>Status</th>
+      <th>Account</th>
       <th></th>
     </tr>
   </thead>
@@ -24,6 +25,7 @@
       <td>{{ employee.role }}</td>
       <td>{{ employee.hire_date }}</td>
       <td>{{ employee.is_active ? 'Active' : 'Inactive' }}</td>
+      <td>{{ employee.has_account ? (employee.access_level | titlecase) : 'No login' }}</td>
       <td>
         <button (click)="openEditModal(employee)">Edit</button>
         <button (click)="deleteEmployee(employee.id)">Delete</button>

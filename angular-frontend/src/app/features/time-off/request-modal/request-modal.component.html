@@ -2,12 +2,14 @@
   <div class="modal-content">
     <h3>New Time-off Request</h3>
     <form (ngSubmit)="onSubmit()">
-      <label>Employee</label>
-      <select [(ngModel)]="employeeId" name="employeeId" required>
-        <option *ngFor="let employee of employees()" [ngValue]="employee.id">
-          {{ employee.full_name }}
-        </option>
-      </select>
+      <ng-container *ngIf="auth.isManager()">
+        <label>Employee</label>
+        <select [(ngModel)]="employeeId" name="employeeId" required>
+          <option *ngFor="let employee of employees()" [ngValue]="employee.id">
+            {{ employee.full_name }}
+          </option>
+        </select>
+      </ng-container>
 
       <label>Start Date</label>
       <input type="date" [(ngModel)]="startDate" name="startDate" required />

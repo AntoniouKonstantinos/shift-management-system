@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimeOffRequest } from '../../core/models/time-off-request.model';
 import { TimeOffService } from '../../core/services/time-off.service';
+import { AuthService } from '../../core/services/auth.service';
 import { RequestModalComponent } from './request-modal/request-modal.component';
 
 @Component({
@@ -12,7 +13,6 @@ import { RequestModalComponent } from './request-modal/request-modal.component';
   templateUrl: './time-off.component.html',
   styleUrl: './time-off.component.css',
 })
-
 export class TimeOffComponent implements OnInit {
   requests = signal<TimeOffRequest[]>([]);
   loading = signal<boolean>(true);
@@ -21,7 +21,10 @@ export class TimeOffComponent implements OnInit {
 
   showModal = signal<boolean>(false);
 
-  constructor(private timeOffService: TimeOffService) {}
+  constructor(
+    private timeOffService: TimeOffService,
+    public auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.loadRequests();
@@ -65,8 +68,8 @@ export class TimeOffComponent implements OnInit {
     });
   }
 
-  deleteRequest(id: number): void {
-    if (!confirm('Delete this request?')) {
+  deleteRequest(id: number, message = 'Delete this request?'): void {
+    if (!confirm(message)) {
       return;
     }
 

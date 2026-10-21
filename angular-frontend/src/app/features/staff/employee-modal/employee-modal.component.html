@@ -13,7 +13,32 @@
 
       <label>Role</label>
       <select [(ngModel)]="roleId" name="roleId" required>
-        <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
+        <option *ngFor="let role of roles()" [ngValue]="role.id">{{ role.name }}</option>
+      </select>
+
+      <label>{{ hasAccount ? 'New password (optional)' : 'Password (optional)' }}</label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        autocomplete="new-password"
+      />
+      <p class="hint">
+        {{
+          hasAccount
+            ? 'Leave empty to keep the current password.'
+            : 'Leave empty to keep this employee without a login.'
+        }}
+      </p>
+
+      <label>Access level</label>
+      <select
+        [(ngModel)]="accessLevel"
+        name="accessLevel"
+        [disabled]="!hasAccount && !password()"
+      >
+        <option value="employee">Employee</option>
+        <option value="manager">Manager</option>
       </select>
 
       <div class="modal-actions">
