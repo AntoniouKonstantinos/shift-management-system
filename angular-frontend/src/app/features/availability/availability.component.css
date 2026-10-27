@@ -1,0 +1,122 @@
+.employee-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--spacing);
+}
+
+.employee-picker select {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.availability-grid {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.day-row:last-child {
+  border-bottom: none;
+}
+
+.day-name {
+  width: 110px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.day-slots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.slot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px 3px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg);
+  font-size: 13px;
+}
+
+.chip-remove {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.chip-remove:hover {
+  background: var(--color-rejected);
+  color: white;
+}
+
+.no-slots {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.add-slot {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.add-slot h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.add-slot-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.add-slot-fields label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.add-slot-fields select,
+.add-slot-fields input {
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .day-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .day-name {
+    width: auto;
+  }
+}

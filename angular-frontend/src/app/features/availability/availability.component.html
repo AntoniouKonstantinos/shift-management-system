@@ -1,0 +1,59 @@
+<div class="page-header">
+  <h2>{{ auth.isManager() ? 'Availability' : 'My Availability' }}</h2>
+</div>
+
+<div class="employee-picker" *ngIf="auth.isManager()">
+  <label>Employee:</label>
+  <select [ngModel]="selectedEmployeeId()" (ngModelChange)="onEmployeeChange($event)">
+    <option *ngFor="let employee of employees()" [ngValue]="employee.id">
+      {{ employee.full_name }}
+    </option>
+  </select>
+</div>
+
+<p *ngIf="loading()">Loading...</p>
+<p *ngIf="error()" class="error">{{ error() }}</p>
+
+<div *ngIf="!loading() && !error()" class="availability-grid">
+  <div class="day-row" *ngFor="let row of days()">
+    <div class="day-name">{{ row.name }}</div>
+    <div class="day-slots">
+      <span class="slot-chip" *ngFor="let slot of row.slots">
+        {{ slot.start_time }}–{{ slot.end_time }}
+        <button
+          type="button"
+          class="chip-remove"
+          aria-label="Remove slot"
+          (click)="deleteSlot(slot)"
+        >
+          ×
+        </button>
+      </span>
+      <span class="no-slots" *ngIf="row.slots.length === 0">Not available</span>
+    </div>
+  </div>
+</div>
+
+<form class="add-slot" *ngIf="selectedEmployeeId() !== null" (ngSubmit)="addSlot()">
+  <h3>Add availability</h3>
+  <div class="add-slot-fields">
+    <div>
+      <label>Day</label>
+      <select [(ngModel)]="day" name="day">
+        <option *ngFor="let name of dayNames; let i = index" [ngValue]="i">{{ name }}</option>
+      </select>
+    </div>
+
+    <div>
+      <label>From</label>
+      <input type="time" [(ngModel)]="startTime" name="startTime" required />
+    </div>
+
+    <div>
+      <label>To</label>
+      <input type="time" [(ngModel)]="endTime" name="endTime" required />
+    </div>
+
+    <button type="submit">Add</button>
+  </div>
+</form>
