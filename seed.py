@@ -70,15 +70,12 @@ with app.app_context():
             start_time=time(10, 0), end_time=time(23, 0)
         ))
 
-    # Availability — Elena: Friday to Sunday, no midnight wraparound
-    db.session.add(Availability(
-        employee_id=elena.id, day_of_week=4,
-        start_time=time(16, 0), end_time=time(23, 59)
-    ))
-    db.session.add(Availability(
-        employee_id=elena.id, day_of_week=5,
-        start_time=time(16, 0), end_time=time(23, 59)
-    ))
+    # Availability — Elena: Friday and Saturday until 02:00 (overnight), Sunday evening
+    for day in (4, 5):
+        db.session.add(Availability(
+            employee_id=elena.id, day_of_week=day,
+            start_time=time(17, 0), end_time=time(2, 0)
+        ))
     db.session.add(Availability(
         employee_id=elena.id, day_of_week=6,
         start_time=time(16, 0), end_time=time(23, 0)
@@ -98,10 +95,14 @@ with app.app_context():
             department_id=kitchen.id, shift_date=shift_date,
             start_time=time(11, 0), end_time=time(22, 0), required_staff=1
         ))
+        db.session.add(Shift(
+            department_id=bar.id, shift_date=shift_date,
+            start_time=time(20, 0), end_time=time(2, 0), required_staff=1
+        ))
 
     db.session.commit()
 
-    print("Seed complete: 5 roles, 3 departments, 4 employees, 4 accounts, availability, 14 shifts.")
+    print("Seed complete: 5 roles, 3 departments, 4 employees, 4 accounts, availability, 21 shifts.")
     print()
     print("Demo logins (local development only):")
     print(f"  manager   manager@example.com   / {MANAGER_PASSWORD}")
