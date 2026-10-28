@@ -14,6 +14,8 @@ class Config:
         "DATABASE_URL", f"sqlite:///{os.path.join(basedir, 'shift_management.db')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    RATELIMIT_ENABLED = True
+    RATELIMIT_STORAGE_URI = "memory://"
 
 
 class DevelopmentConfig(Config):
@@ -23,6 +25,11 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    RATELIMIT_ENABLED = False
+
+
+class RateLimitedTestingConfig(TestingConfig):
+    RATELIMIT_ENABLED = True
 
 
 class ProductionConfig(Config):
@@ -32,6 +39,7 @@ class ProductionConfig(Config):
 config = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
+    "testing_ratelimit": RateLimitedTestingConfig,
     "production": ProductionConfig,
     "default": DevelopmentConfig,
 }

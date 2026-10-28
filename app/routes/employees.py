@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify, g
 from app import db
 from app.models import Employee, Role, UserAccount, ACCESS_MANAGER, ACCESS_EMPLOYEE
-from app.security import manager_required
+from app.security import manager_required, MIN_PASSWORD_LENGTH
 
 bp = Blueprint("employees", __name__, url_prefix="/api/employees")
 
 VALID_ACCESS_LEVELS = {ACCESS_MANAGER, ACCESS_EMPLOYEE}
-MIN_PASSWORD_LENGTH = 8
 
 
 @bp.route("", methods=["GET"])

@@ -4,6 +4,7 @@ from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from app import db
 from app.models import UserAccount
 
+MIN_PASSWORD_LENGTH = 8
 
 def register_jwt_callbacks(jwt):
     """Make every authentication failure use the same {"error": ...} shape as the rest of the API."""
