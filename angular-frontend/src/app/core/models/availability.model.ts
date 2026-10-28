@@ -4,6 +4,7 @@ export interface Availability {
   day_of_week: number;
   start_time: string;
   end_time: string;
+  ends_next_day: boolean;
 }
 
 export interface AvailabilityCreate {

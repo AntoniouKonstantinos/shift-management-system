@@ -218,6 +218,19 @@ button:disabled {
   background: var(--color-text-muted);
 }
 
+/* Overnight marker */
+
+.next-day {
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
 /* Responsive */
 
 @media (max-width: 768px) {

@@ -4,6 +4,7 @@ export interface Shift {
   shift_date: string;
   start_time: string;
   end_time: string;
+  ends_next_day: boolean;
   required_staff: number;
   assigned_count: number;
   notes: string | null;

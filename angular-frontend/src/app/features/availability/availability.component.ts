@@ -101,7 +101,7 @@ export class AvailabilityComponent implements OnInit {
     });
   }
 
-  addSlot(): void {
+    addSlot(): void {
     const employeeId = this.selectedEmployeeId();
     const start = this.startTime();
     const end = this.endTime();
@@ -113,8 +113,8 @@ export class AvailabilityComponent implements OnInit {
       alert('Please choose a start and an end time.');
       return;
     }
-    if (start >= end) {
-      alert('Start time must be before end time.');
+    if (start === end) {
+      alert('Start and end time cannot be the same.');
       return;
     }
 

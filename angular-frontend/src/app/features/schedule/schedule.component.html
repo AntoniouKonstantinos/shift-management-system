@@ -12,7 +12,8 @@
 
     <div class="shift-card" *ngFor="let shift of day.shifts">
       <strong>{{ shift.department }}</strong><br />
-      {{ shift.start_time }}–{{ shift.end_time }}<br />
+      {{ shift.start_time }}–{{ shift.end_time }}
+      <span class="next-day" *ngIf="shift.ends_next_day" title="Ends the next day">+1</span><br />
       {{ shift.assigned_count }}/{{ shift.required_staff }} Covered
       <button *ngIf="auth.isManager()" (click)="openAssignModal(shift.id)">+ Assign</button>
     </div>

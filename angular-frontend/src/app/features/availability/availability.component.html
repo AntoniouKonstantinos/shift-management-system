@@ -20,6 +20,7 @@
     <div class="day-slots">
       <span class="slot-chip" *ngFor="let slot of row.slots">
         {{ slot.start_time }}–{{ slot.end_time }}
+        <span class="next-day" *ngIf="slot.ends_next_day" title="Ends the next day">+1</span>
         <button
           type="button"
           class="chip-remove"
@@ -56,4 +57,8 @@
 
     <button type="submit">Add</button>
   </div>
+  <p class="hint">
+    If the end time is earlier than the start time, the slot ends the next day
+    (for example 18:00 to 02:00).
+  </p>
 </form>
