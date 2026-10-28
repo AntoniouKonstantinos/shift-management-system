@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from app import db
 from app.models import Shift, Department
 from app.security import login_required, manager_required
+from app.timeutils import crosses_midnight, is_valid_range
 
 bp = Blueprint("shifts", __name__, url_prefix="/api/shifts")
 
@@ -51,8 +52,8 @@ def create_shift():
     start_time = _parse_time(data["start_time"])
     end_time = _parse_time(data["end_time"])
 
-    if start_time >= end_time:
-        return jsonify({"error": "start_time must be before end_time"}), 400
+    if not is_valid_range(start_time, end_time):
+        return jsonify({"error": "start_time and end_time cannot be the same"}), 400
 
     shift = Shift(
         department_id=data["department_id"],
@@ -86,8 +87,8 @@ def update_shift(shift_id):
     if "end_time" in data:
         shift.end_time = _parse_time(data["end_time"])
 
-    if shift.start_time >= shift.end_time:
-        return jsonify({"error": "start_time must be before end_time"}), 400
+    if not is_valid_range(shift.start_time, shift.end_time):
+        return jsonify({"error": "start_time and end_time cannot be the same"}), 400
 
     shift.required_staff = data.get("required_staff", shift.required_staff)
     shift.notes = data.get("notes", shift.notes)
@@ -120,6 +121,7 @@ def _serialize(shift, include_assignments=False):
         "shift_date": shift.shift_date.isoformat(),
         "start_time": shift.start_time.strftime("%H:%M"),
         "end_time": shift.end_time.strftime("%H:%M"),
+        "ends_next_day": crosses_midnight(shift.start_time, shift.end_time),
         "required_staff": shift.required_staff,
         "assigned_count": len(shift.assignments),
         "notes": shift.notes,

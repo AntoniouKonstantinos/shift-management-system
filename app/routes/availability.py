@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, g
 from app import db
 from app.models import Availability, Employee
 from app.security import login_required
+from app.timeutils import crosses_midnight, is_valid_range, weekly_slots_overlap
 
 bp = Blueprint("availability", __name__, url_prefix="/api/employees/<int:employee_id>/availability")
 
@@ -43,8 +44,8 @@ def create_availability(employee_id):
     start_time = _parse_time(data["start_time"])
     end_time = _parse_time(data["end_time"])
 
-    if start_time >= end_time:
-        return jsonify({"error": "start_time must be before end_time"}), 400
+    if not is_valid_range(start_time, end_time):
+        return jsonify({"error": "start_time and end_time cannot be the same"}), 400
 
     if _overlaps_existing(employee_id, day_of_week, start_time, end_time):
         return jsonify({"error": "Overlaps with an existing availability slot"}), 409
@@ -78,8 +79,8 @@ def update_availability(employee_id, slot_id):
     start_time = _parse_time(data["start_time"]) if "start_time" in data else slot.start_time
     end_time = _parse_time(data["end_time"]) if "end_time" in data else slot.end_time
 
-    if start_time >= end_time:
-        return jsonify({"error": "start_time must be before end_time"}), 400
+    if not is_valid_range(start_time, end_time):
+        return jsonify({"error": "start_time and end_time cannot be the same"}), 400
 
     if _overlaps_existing(employee_id, day_of_week, start_time, end_time, exclude_id=slot.id):
         return jsonify({"error": "Overlaps with an existing availability slot"}), 409
@@ -114,12 +115,16 @@ def _forbidden_unless_self_or_manager(employee_id):
 
 
 def _overlaps_existing(employee_id, day_of_week, start_time, end_time, exclude_id=None):
-    query = Availability.query.filter_by(employee_id=employee_id, day_of_week=day_of_week)
+    """Compare against every slot of the employee, since an overnight slot spills into the next day."""
+    query = Availability.query.filter_by(employee_id=employee_id)
     if exclude_id:
         query = query.filter(Availability.id != exclude_id)
 
     for slot in query.all():
-        if start_time < slot.end_time and slot.start_time < end_time:
+        if weekly_slots_overlap(
+            day_of_week, start_time, end_time,
+            slot.day_of_week, slot.start_time, slot.end_time,
+        ):
             return True
     return False
 
@@ -135,4 +140,5 @@ def _serialize(slot):
         "day_of_week": slot.day_of_week,
         "start_time": slot.start_time.strftime("%H:%M"),
         "end_time": slot.end_time.strftime("%H:%M"),
+        "ends_next_day": crosses_midnight(slot.start_time, slot.end_time),
     }
