@@ -2,7 +2,12 @@ import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { AuthUser, LoginResponse } from '../models/auth.model';
+import {
+  AuthUser,
+  ChangePasswordRequest,
+  LoginResponse,
+  MessageResponse,
+} from '../models/auth.model';
 
 const TOKEN_KEY = 'access_token';
 
@@ -33,6 +38,14 @@ export class AuthService {
       }),
       map((response) => response.user),
     );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<MessageResponse> {
+    const payload: ChangePasswordRequest = {
+      current_password: currentPassword,
+      new_password: newPassword,
+    };
+    return this.http.post<MessageResponse>(`${this.baseUrl}/change-password`, payload);
   }
 
   restoreSession(): Observable<AuthUser | null> {

@@ -3,6 +3,7 @@ import { ScheduleComponent } from './features/schedule/schedule.component';
 import { StaffComponent } from './features/staff/staff.component';
 import { TimeOffComponent } from './features/time-off/time-off.component';
 import { AvailabilityComponent } from './features/availability/availability.component';
+import { AccountComponent } from './features/account/account.component';
 import { LoginComponent } from './features/login/login.component';
 import { authGuard, managerGuard, guestGuard } from './core/guards/auth.guard';
 
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'staff', component: StaffComponent, canActivate: [managerGuard] },
   { path: 'availability', component: AvailabilityComponent, canActivate: [authGuard] },
   { path: 'time-off', component: TimeOffComponent, canActivate: [authGuard] },
+  { path: 'account', component: AccountComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];

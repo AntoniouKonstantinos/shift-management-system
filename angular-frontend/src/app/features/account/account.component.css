@@ -1,0 +1,69 @@
+.account-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.account-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.account-card h3 {
+  margin: 0 0 16px;
+}
+
+.profile-list {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px 12px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.profile-list dt {
+  color: var(--color-text-muted);
+}
+
+.profile-list dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.account-card label {
+  display: block;
+  margin: 12px 0 4px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.account-card input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.success {
+  color: var(--color-approved);
+}
+
+.account-card button[type="submit"] {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+}

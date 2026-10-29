@@ -36,6 +36,13 @@
 .user-name {
   font-size: 14px;
   font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.user-name:hover,
+.user-name.active {
+  color: var(--color-primary);
 }
 
 .user-badge {

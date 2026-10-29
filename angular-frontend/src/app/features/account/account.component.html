@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h2>My Account</h2>
+</div>
+
+<div class="account-layout" *ngIf="auth.currentUser() as user">
+  <section class="account-card">
+    <h3>Profile</h3>
+    <dl class="profile-list">
+      <dt>Name</dt>
+      <dd>{{ user.full_name }}</dd>
+
+      <dt>Email</dt>
+      <dd>{{ user.email }}</dd>
+
+      <dt>Job role</dt>
+      <dd>{{ user.role }}</dd>
+
+      <dt>Access level</dt>
+      <dd>{{ user.access_level | titlecase }}</dd>
+    </dl>
+  </section>
+
+  <section class="account-card">
+    <h3>Change password</h3>
+    <form (ngSubmit)="onSubmit()">
+      <label>Current password</label>
+      <input
+        type="password"
+        [(ngModel)]="currentPassword"
+        name="currentPassword"
+        autocomplete="current-password"
+        required
+      />
+
+      <label>New password</label>
+      <input
+        type="password"
+        [(ngModel)]="newPassword"
+        name="newPassword"
+        autocomplete="new-password"
+        required
+      />
+      <p class="hint">At least {{ minLength }} characters.</p>
+
+      <label>Confirm new password</label>
+      <input
+        type="password"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        autocomplete="new-password"
+        required
+      />
+
+      <p *ngIf="error()" class="error">{{ error() }}</p>
+      <p *ngIf="success()" class="success">{{ success() }}</p>
+
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Saving...' : 'Update password' }}
+      </button>
+    </form>
+  </section>
+</div>

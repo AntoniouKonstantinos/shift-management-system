@@ -15,8 +15,8 @@ import { Employee, EmployeeCreate, EmployeeUpdate } from '../../../core/models/e
 import { Role } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { EmployeeService } from '../../../core/services/employee.service';
+import { MIN_PASSWORD_LENGTH } from '../../../core/constants';
 
-const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-employee-modal',

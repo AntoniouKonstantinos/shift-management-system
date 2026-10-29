@@ -17,3 +17,12 @@ export interface LoginResponse {
   access_token: string;
   user: AuthUser;
 }
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}

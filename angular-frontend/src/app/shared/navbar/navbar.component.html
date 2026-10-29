@@ -19,7 +19,7 @@
   </div>
 
   <div class="nav-user" *ngIf="auth.currentUser() as user">
-    <span class="user-name">{{ user.full_name }}</span>
+    <a routerLink="/account" routerLinkActive="active" class="user-name">{{ user.full_name }}</a>
     <span class="user-badge">{{ user.access_level }}</span>
     <button type="button" class="logout-btn" (click)="auth.logout()">Log out</button>
   </div>
