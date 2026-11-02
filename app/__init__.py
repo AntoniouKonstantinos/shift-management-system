@@ -27,6 +27,7 @@ def create_app(config_name="default"):
 
     from app.routes.auth import bp as auth_bp
     from app.routes.employees import bp as employees_bp
+    from app.routes.departments import bp as departments_bp
     from app.routes.shifts import bp as shifts_bp
     from app.routes.assignments import bp as assignments_bp
     from app.routes.availability import bp as availability_bp
@@ -35,6 +36,7 @@ def create_app(config_name="default"):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(employees_bp)
+    app.register_blueprint(departments_bp)
     app.register_blueprint(shifts_bp)
     app.register_blueprint(assignments_bp)
     app.register_blueprint(availability_bp)

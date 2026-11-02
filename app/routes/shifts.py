@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
+from sqlalchemy.orm import joinedload, selectinload
 from app import db
-from app.models import Shift, Department
+from app.models import Shift, ShiftAssignment, Department
 from app.security import login_required, manager_required
 from app.timeutils import crosses_midnight, is_valid_range
 
@@ -11,7 +12,10 @@ bp = Blueprint("shifts", __name__, url_prefix="/api/shifts")
 @bp.route("", methods=["GET"])
 @login_required
 def list_shifts():
-    query = Shift.query
+    query = Shift.query.options(
+        joinedload(Shift.department),
+        selectinload(Shift.assignments).joinedload(ShiftAssignment.employee),
+    )
 
     department_id = request.args.get("department_id", type=int)
     if department_id:
@@ -31,8 +35,8 @@ def list_shifts():
 @bp.route("/<int:shift_id>", methods=["GET"])
 @login_required
 def get_shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
-    return jsonify(_serialize(shift, include_assignments=True)), 200
+    shift = db.get_or_404(Shift, shift_id)
+    return jsonify(_serialize(shift)), 200
 
 
 @bp.route("", methods=["POST"])
@@ -45,7 +49,7 @@ def create_shift():
     if missing:
         return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
-    if not Department.query.get(data["department_id"]):
+    if not db.session.get(Department, data["department_id"]):
         return jsonify({"error": "Invalid department_id"}), 400
 
     shift_date = _parse_date(data["shift_date"])
@@ -72,11 +76,11 @@ def create_shift():
 @bp.route("/<int:shift_id>", methods=["PUT"])
 @manager_required
 def update_shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = db.get_or_404(Shift, shift_id)
     data = request.get_json()
 
     if "department_id" in data:
-        if not Department.query.get(data["department_id"]):
+        if not db.session.get(Department, data["department_id"]):
             return jsonify({"error": "Invalid department_id"}), 400
         shift.department_id = data["department_id"]
 
@@ -100,7 +104,7 @@ def update_shift(shift_id):
 @bp.route("/<int:shift_id>", methods=["DELETE"])
 @manager_required
 def delete_shift(shift_id):
-    shift = Shift.query.get_or_404(shift_id)
+    shift = db.get_or_404(Shift, shift_id)
     db.session.delete(shift)
     db.session.commit()
     return "", 204
@@ -114,8 +118,8 @@ def _parse_time(value):
     return datetime.strptime(value, "%H:%M").time()
 
 
-def _serialize(shift, include_assignments=False):
-    data = {
+def _serialize(shift):
+    return {
         "id": shift.id,
         "department": shift.department.name,
         "shift_date": shift.shift_date.isoformat(),
@@ -125,14 +129,13 @@ def _serialize(shift, include_assignments=False):
         "required_staff": shift.required_staff,
         "assigned_count": len(shift.assignments),
         "notes": shift.notes,
-    }
-    if include_assignments:
-        data["assignments"] = [
+        "assignments": [
             {
                 "id": a.id,
+                "employee_id": a.employee_id,
                 "employee": a.employee.full_name,
                 "status": a.status,
             }
             for a in shift.assignments
-        ]
-    return data
+        ],
+    }
