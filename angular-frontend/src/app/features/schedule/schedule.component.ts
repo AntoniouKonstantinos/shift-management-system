@@ -1,9 +1,11 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Shift } from '../../core/models/shift.model';
 import { ShiftService } from '../../core/services/shift.service';
-import { AssignModalComponent } from './assign-modal/assign-modal.component';
+import { AssignmentService } from '../../core/services/assignment.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AssignModalComponent } from './assign-modal/assign-modal.component';
+import { ShiftModalComponent } from './shift-modal/shift-modal.component';
 
 interface DayColumn {
   date: string;
@@ -13,7 +15,7 @@ interface DayColumn {
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule, AssignModalComponent],
+  imports: [CommonModule, AssignModalComponent, ShiftModalComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css',
 })
@@ -21,7 +23,12 @@ export class ScheduleComponent implements OnInit {
   currentWeekStart = signal<Date>(this.getMonday(new Date()));
   days = signal<DayColumn[]>([]);
   loading = signal<boolean>(true);
+
   activeShiftId = signal<number | null>(null);
+
+  shiftModalOpen = signal<boolean>(false);
+  editingShift = signal<Shift | null>(null);
+  newShiftDate = signal<string | null>(null);
 
   weekLabel = computed(() => {
     const start = this.currentWeekStart();
@@ -32,6 +39,7 @@ export class ScheduleComponent implements OnInit {
 
   constructor(
     private shiftService: ShiftService,
+    private assignmentService: AssignmentService,
     public auth: AuthService,
   ) {}
 
@@ -54,8 +62,11 @@ export class ScheduleComponent implements OnInit {
     this.loadWeek();
   }
 
-  private loadWeek(): void {
-    this.loading.set(true);
+  private loadWeek(showLoading = true): void {
+    if (showLoading) {
+      this.loading.set(true);
+    }
+
     const start = this.currentWeekStart();
     const weekEnd = new Date(start);
     weekEnd.setDate(weekEnd.getDate() + 6);
@@ -103,6 +114,18 @@ export class ScheduleComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
+  coverageClass(shift: Shift): string {
+    if (shift.assigned_count >= shift.required_staff) return 'covered';
+    if (shift.assigned_count === 0) return 'empty';
+    return 'partial';
+  }
+
+  shortName(fullName: string): string {
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length < 2) return parts[0];
+    return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+  }
+
   openAssignModal(shiftId: number): void {
     this.activeShiftId.set(shiftId);
   }
@@ -113,6 +136,53 @@ export class ScheduleComponent implements OnInit {
 
   onAssignModalSaved(): void {
     this.activeShiftId.set(null);
-    this.loadWeek();
+    this.loadWeek(false);
+  }
+
+  openCreateShift(date: string): void {
+    this.editingShift.set(null);
+    this.newShiftDate.set(date);
+    this.shiftModalOpen.set(true);
+  }
+
+  openEditShift(shift: Shift): void {
+    this.editingShift.set(shift);
+    this.newShiftDate.set(null);
+    this.shiftModalOpen.set(true);
+  }
+
+  onShiftModalClose(): void {
+    this.shiftModalOpen.set(false);
+  }
+
+  onShiftModalSaved(): void {
+    this.shiftModalOpen.set(false);
+    this.loadWeek(false);
+  }
+
+  deleteShift(shift: Shift): void {
+    const warning =
+      shift.assigned_count > 0
+        ? ` The ${shift.assigned_count} assigned staff will be removed from it.`
+        : '';
+    const message =
+      `Delete the ${shift.department} shift on ${shift.shift_date} ` +
+      `(${shift.start_time}–${shift.end_time})?${warning}`;
+
+    if (!confirm(message)) {
+      return;
+    }
+
+    this.shiftService.delete(shift.id).subscribe({
+      next: () => this.loadWeek(false),
+      error: (err) => alert(err.error?.error ?? 'Failed to delete the shift.'),
+    });
+  }
+
+  removeAssignment(assignmentId: number): void {
+    this.assignmentService.remove(assignmentId).subscribe({
+      next: () => this.loadWeek(false),
+      error: (err) => alert(err.error?.error ?? 'Failed to remove the assignment.'),
+    });
   }
 }

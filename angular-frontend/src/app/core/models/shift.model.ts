@@ -1,5 +1,13 @@
+export interface ShiftAssignmentDetail {
+  id: number;
+  employee_id: number;
+  employee: string;
+  status: string;
+}
+
 export interface Shift {
   id: number;
+  department_id: number;
   department: string;
   shift_date: string;
   start_time: string;
@@ -8,13 +16,7 @@ export interface Shift {
   required_staff: number;
   assigned_count: number;
   notes: string | null;
-  assignments?: ShiftAssignmentDetail[];
-}
-
-export interface ShiftAssignmentDetail {
-  id: number;
-  employee: string;
-  status: string;
+  assignments: ShiftAssignmentDetail[];
 }
 
 export interface ShiftCreate {

@@ -8,14 +8,53 @@
 
 <div *ngIf="!loading()" class="calendar-grid">
   <div class="day-column" *ngFor="let day of days()">
-    <h4>{{ day.date }}</h4>
+    <div class="day-header">
+      <h4>{{ day.date }}</h4>
+      <button
+        *ngIf="auth.isManager()"
+        type="button"
+        class="add-shift-btn"
+        title="Add a shift on this day"
+        [attr.aria-label]="'Add a shift on ' + day.date"
+        (click)="openCreateShift(day.date)"
+      >
+        +
+      </button>
+    </div>
 
-    <div class="shift-card" *ngFor="let shift of day.shifts">
-      <strong>{{ shift.department }}</strong><br />
-      {{ shift.start_time }}–{{ shift.end_time }}
-      <span class="next-day" *ngIf="shift.ends_next_day" title="Ends the next day">+1</span><br />
-      {{ shift.assigned_count }}/{{ shift.required_staff }} Covered
-      <button *ngIf="auth.isManager()" (click)="openAssignModal(shift.id)">+ Assign</button>
+    <div class="shift-card" *ngFor="let shift of day.shifts" [ngClass]="coverageClass(shift)">
+      <div class="shift-head">
+        <strong>{{ shift.department }}</strong>
+        <span class="shift-actions" *ngIf="auth.isManager()">
+          <button type="button" class="icon-btn" (click)="openEditShift(shift)">Edit</button>
+          <button type="button" class="icon-btn danger" (click)="deleteShift(shift)">Delete</button>
+        </span>
+      </div>
+
+      <div>
+        {{ shift.start_time }}–{{ shift.end_time }}
+        <span class="next-day" *ngIf="shift.ends_next_day" title="Ends the next day">+1</span>
+      </div>
+      <div>{{ shift.assigned_count }}/{{ shift.required_staff }} Covered</div>
+
+      <ul class="assignees" *ngIf="shift.assignments.length > 0">
+        <li class="assignee" *ngFor="let assignment of shift.assignments">
+          <span [title]="assignment.employee">{{ shortName(assignment.employee) }}</span>
+          <button
+            *ngIf="auth.isManager()"
+            type="button"
+            class="assignee-remove"
+            [attr.aria-label]="'Remove ' + assignment.employee + ' from this shift'"
+            (click)="removeAssignment(assignment.id)"
+          >
+            ×
+          </button>
+        </li>
+      </ul>
+
+      <button *ngIf="auth.isManager()" type="button" (click)="openAssignModal(shift.id)">
+        + Assign
+      </button>
     </div>
   </div>
 </div>
@@ -26,3 +65,11 @@
   (close)="onAssignModalClose()"
   (saved)="onAssignModalSaved()"
 ></app-assign-modal>
+
+<app-shift-modal
+  *ngIf="shiftModalOpen()"
+  [shift]="editingShift()"
+  [initialDate]="newShiftDate()"
+  (close)="onShiftModalClose()"
+  (saved)="onShiftModalSaved()"
+></app-shift-modal>

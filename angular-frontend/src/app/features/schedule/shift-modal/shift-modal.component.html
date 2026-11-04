@@ -1,0 +1,42 @@
+<div class="modal">
+  <div class="modal-content">
+    <h3>{{ shift ? 'Edit shift' : 'New shift' }}</h3>
+    <form (ngSubmit)="onSubmit()">
+      <label>Department</label>
+      <select [(ngModel)]="departmentId" name="departmentId" required>
+        <option *ngFor="let department of departments()" [ngValue]="department.id">
+          {{ department.name }}
+        </option>
+      </select>
+
+      <label>Date</label>
+      <input type="date" [(ngModel)]="shiftDate" name="shiftDate" required />
+
+      <div class="time-row">
+        <div>
+          <label>From</label>
+          <input type="time" [(ngModel)]="startTime" name="startTime" required />
+        </div>
+        <div>
+          <label>To</label>
+          <input type="time" [(ngModel)]="endTime" name="endTime" required />
+        </div>
+      </div>
+      <p class="notice" *ngIf="endsNextDay()">This shift ends the next day.</p>
+      <p class="hint" *ngIf="!endsNextDay()">
+        If the end time is earlier than the start time, the shift ends the next day.
+      </p>
+
+      <label>Staff needed</label>
+      <input type="number" min="1" step="1" [(ngModel)]="requiredStaff" name="requiredStaff" required />
+
+      <label>Notes (optional)</label>
+      <input type="text" [(ngModel)]="notes" name="notes" maxlength="255" />
+
+      <div class="modal-actions">
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving...' : 'Save' }}</button>
+        <button type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

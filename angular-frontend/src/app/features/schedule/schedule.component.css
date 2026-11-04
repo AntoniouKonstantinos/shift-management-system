@@ -1,0 +1,102 @@
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.day-header h4 {
+  margin: 0;
+}
+
+.add-shift-btn {
+  width: auto;
+  margin: 0;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.shift-card {
+  border-left: 4px solid var(--color-border);
+}
+
+.shift-card.covered {
+  border-left-color: var(--color-approved);
+}
+
+.shift-card.partial {
+  border-left-color: var(--color-pending);
+}
+
+.shift-card.empty {
+  border-left-color: var(--color-rejected);
+}
+
+.shift-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.shift-actions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  width: auto;
+  margin: 0;
+  padding: 1px 6px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.icon-btn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.icon-btn.danger:hover {
+  background: var(--color-rejected);
+}
+
+.assignees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px 1px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: 12px;
+}
+
+.assignee-remove {
+  width: auto;
+  margin: 0;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.assignee-remove:hover {
+  background: var(--color-rejected);
+  color: white;
+}

@@ -203,3 +203,52 @@ def test_deleting_a_shift_also_removes_its_assignments(client, staff_world):
     headers = headers_for(client, "manager@example.com")
     assert client.delete(f"/api/shifts/{shift.id}", headers=headers).status_code == 204
     assert ShiftAssignment.query.count() == 0
+
+
+
+# --- extra fields and input rules ---
+
+def test_shifts_report_their_department_id(client, staff_world):
+    shift = make_shift(staff_world["kitchen"], FRIDAY, time(11, 0), time(22, 0))
+    headers = headers_for(client, "elena@example.com")
+    item = client.get(f"/api/shifts/{shift.id}", headers=headers).get_json()
+    assert item["department_id"] == staff_world["kitchen"].id
+
+
+def new_shift_payload(staff_world, **overrides):
+    payload = {
+        "department_id": staff_world["bar"].id, "shift_date": "2026-09-04",
+        "start_time": "20:00", "end_time": "02:00",
+    }
+    payload.update(overrides)
+    return payload
+
+
+@pytest.mark.parametrize("value", [0, -1, "two", 1.5, True])
+def test_required_staff_must_be_a_whole_number_of_at_least_one(client, staff_world, value):
+    headers = headers_for(client, "manager@example.com")
+    payload = new_shift_payload(staff_world, required_staff=value)
+    assert client.post("/api/shifts", json=payload, headers=headers).status_code == 400
+
+
+def test_an_invalid_required_staff_on_update_is_rejected_and_changes_nothing(client, staff_world):
+    shift = make_shift(staff_world["bar"], FRIDAY, time(20, 0), time(2, 0), required_staff=2)
+    headers = headers_for(client, "manager@example.com")
+
+    response = client.put(f"/api/shifts/{shift.id}", json={"required_staff": 0}, headers=headers)
+    assert response.status_code == 400
+
+    item = client.get(f"/api/shifts/{shift.id}", headers=headers).get_json()
+    assert item["required_staff"] == 2
+
+
+def test_notes_longer_than_255_characters_are_rejected(client, staff_world):
+    headers = headers_for(client, "manager@example.com")
+    payload = new_shift_payload(staff_world, notes="x" * 256)
+    assert client.post("/api/shifts", json=payload, headers=headers).status_code == 400
+
+
+def test_notes_of_255_characters_are_accepted(client, staff_world):
+    headers = headers_for(client, "manager@example.com")
+    payload = new_shift_payload(staff_world, notes="x" * 255)
+    assert client.post("/api/shifts", json=payload, headers=headers).status_code == 201

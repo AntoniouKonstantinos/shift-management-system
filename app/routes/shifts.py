@@ -8,6 +8,10 @@ from app.timeutils import crosses_midnight, is_valid_range
 
 bp = Blueprint("shifts", __name__, url_prefix="/api/shifts")
 
+REQUIRED_STAFF_ERROR = "required_staff must be a whole number of at least 1"
+NOTES_ERROR = "notes must be text of at most 255 characters"
+MAX_NOTES_LENGTH = 255
+
 
 @bp.route("", methods=["GET"])
 @login_required
@@ -59,13 +63,21 @@ def create_shift():
     if not is_valid_range(start_time, end_time):
         return jsonify({"error": "start_time and end_time cannot be the same"}), 400
 
+    required_staff = data.get("required_staff", 1)
+    if _invalid_required_staff(required_staff):
+        return jsonify({"error": REQUIRED_STAFF_ERROR}), 400
+
+    notes = data.get("notes")
+    if _invalid_notes(notes):
+        return jsonify({"error": NOTES_ERROR}), 400
+
     shift = Shift(
         department_id=data["department_id"],
         shift_date=shift_date,
         start_time=start_time,
         end_time=end_time,
-        required_staff=data.get("required_staff", 1),
-        notes=data.get("notes"),
+        required_staff=required_staff,
+        notes=notes,
     )
     db.session.add(shift)
     db.session.commit()
@@ -78,6 +90,11 @@ def create_shift():
 def update_shift(shift_id):
     shift = db.get_or_404(Shift, shift_id)
     data = request.get_json()
+
+    if "required_staff" in data and _invalid_required_staff(data["required_staff"]):
+        return jsonify({"error": REQUIRED_STAFF_ERROR}), 400
+    if "notes" in data and _invalid_notes(data["notes"]):
+        return jsonify({"error": NOTES_ERROR}), 400
 
     if "department_id" in data:
         if not db.session.get(Department, data["department_id"]):
@@ -110,6 +127,15 @@ def delete_shift(shift_id):
     return "", 204
 
 
+def _invalid_required_staff(value):
+    # bool is a subclass of int in Python, so True/False must be rejected explicitly
+    return not isinstance(value, int) or isinstance(value, bool) or value < 1
+
+
+def _invalid_notes(value):
+    return value is not None and (not isinstance(value, str) or len(value) > MAX_NOTES_LENGTH)
+
+
 def _parse_date(value):
     return datetime.strptime(value, "%Y-%m-%d").date()
 
@@ -121,6 +147,7 @@ def _parse_time(value):
 def _serialize(shift):
     return {
         "id": shift.id,
+        "department_id": shift.department_id,
         "department": shift.department.name,
         "shift_date": shift.shift_date.isoformat(),
         "start_time": shift.start_time.strftime("%H:%M"),
