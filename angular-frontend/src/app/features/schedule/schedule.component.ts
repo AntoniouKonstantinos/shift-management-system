@@ -111,7 +111,10 @@ export class ScheduleComponent implements OnInit {
   }
 
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   coverageClass(shift: Shift): string {
@@ -176,6 +179,35 @@ export class ScheduleComponent implements OnInit {
     this.shiftService.delete(shift.id).subscribe({
       next: () => this.loadWeek(false),
       error: (err) => alert(err.error?.error ?? 'Failed to delete the shift.'),
+    });
+  }
+
+  copyToNextWeek(): void {
+    const shiftCount = this.days().reduce((total, day) => total + day.shifts.length, 0);
+    if (shiftCount === 0) {
+      alert('There are no shifts in this week to copy.');
+      return;
+    }
+
+    const source = this.currentWeekStart();
+    const target = new Date(source);
+    target.setDate(target.getDate() + 7);
+    const targetStart = this.formatDate(target);
+
+    const message =
+      `Copy the ${shiftCount} shifts of this week to the week starting ${targetStart}? ` +
+      'Assigned staff are not copied, and shifts that already exist skipped.';
+    if (!confirm(message)) {
+      return;
+    }
+
+    this.shiftService.duplicateWeek(this.formatDate(source), targetStart).subscribe({
+      next: (result) => {
+        const skipped = result.skipped > 0 ? ` (${result.skipped} already existed)` : '';
+        alert(`Copied ${result.created} shifts${skipped}.`);
+        this.nextWeek();
+      },
+      error: (err) => alert(err.error?.error ?? 'Failed to copy the week.'),
     });
   }
 

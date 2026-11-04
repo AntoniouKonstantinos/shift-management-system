@@ -252,3 +252,109 @@ def test_notes_of_255_characters_are_accepted(client, staff_world):
     headers = headers_for(client, "manager@example.com")
     payload = new_shift_payload(staff_world, notes="x" * 255)
     assert client.post("/api/shifts", json=payload, headers=headers).status_code == 201
+
+
+# --- duplicate week ---
+
+SOURCE_MONDAY = "2026-08-31"
+TARGET_MONDAY = "2026-09-07"
+
+
+def duplicate(client, headers, source=SOURCE_MONDAY, target=TARGET_MONDAY):
+    return client.post(
+        "/api/shifts/duplicate-week",
+        json={"source_week_start": source, "target_week_start": target},
+        headers=headers,
+    )
+
+
+def shifts_between(client, headers, date_from, date_to):
+    response = client.get(f"/api/shifts?date_from={date_from}&date_to={date_to}", headers=headers)
+    return response.get_json()
+
+
+def test_an_employee_cannot_duplicate_a_week(client, staff_world):
+    headers = headers_for(client, "elena@example.com")
+    assert duplicate(client, headers).status_code == 403
+
+
+def test_duplicating_a_week_copies_the_shifts_but_not_the_assignments(client, staff_world):
+    friday = make_shift(staff_world["bar"], date(2026, 9, 4), time(20, 0), time(2, 0), required_staff=2)
+    friday.notes = "Live music"
+    db.session.commit()
+    assign(staff_world["elena"], friday)
+    make_shift(staff_world["kitchen"], date(2026, 8, 31), time(11, 0), time(22, 0))
+
+    headers = headers_for(client, "manager@example.com")
+    response = duplicate(client, headers)
+    assert response.status_code == 201
+    assert response.get_json() == {"created": 2, "skipped": 0}
+
+    copied = shifts_between(client, headers, "2026-09-07", "2026-09-13")
+    assert [(s["shift_date"], s["department"]) for s in copied] == [
+        ("2026-09-07", "Kitchen"),
+        ("2026-09-11", "Bar"),
+    ]
+    bar = copied[1]
+    assert (bar["start_time"], bar["end_time"], bar["ends_next_day"]) == ("20:00", "02:00", True)
+    assert bar["required_staff"] == 2
+    assert bar["notes"] == "Live music"
+    assert bar["assignments"] == []
+
+    original = shifts_between(client, headers, "2026-08-31", "2026-09-06")
+    assert [len(s["assignments"]) for s in original] == [0, 1]
+
+
+def test_duplicating_twice_does_not_create_duplicates(client, staff_world):
+    make_shift(staff_world["bar"], date(2026, 9, 4), time(20, 0), time(2, 0))
+    make_shift(staff_world["kitchen"], date(2026, 8, 31), time(11, 0), time(22, 0))
+    headers = headers_for(client, "manager@example.com")
+
+    assert duplicate(client, headers).get_json() == {"created": 2, "skipped": 0}
+
+    second = duplicate(client, headers)
+    assert second.status_code == 200
+    assert second.get_json() == {"created": 0, "skipped": 2}
+    assert len(shifts_between(client, headers, "2026-09-07", "2026-09-13")) == 2
+
+
+def test_a_shift_that_already_exists_in_the_target_week_is_skipped(client, staff_world):
+    make_shift(staff_world["bar"], date(2026, 9, 4), time(20, 0), time(2, 0))
+    make_shift(staff_world["kitchen"], date(2026, 8, 31), time(11, 0), time(22, 0))
+    make_shift(staff_world["kitchen"], date(2026, 9, 7), time(11, 0), time(22, 0))
+
+    headers = headers_for(client, "manager@example.com")
+    assert duplicate(client, headers).get_json() == {"created": 1, "skipped": 1}
+    assert len(shifts_between(client, headers, "2026-09-07", "2026-09-13")) == 2
+
+
+def test_only_shifts_inside_the_source_week_are_copied(client, staff_world):
+    make_shift(staff_world["bar"], date(2026, 9, 6), time(20, 0), time(2, 0))      # Sunday, inside
+    make_shift(staff_world["bar"], date(2026, 9, 7), time(20, 0), time(2, 0))      # next Monday, outside
+    make_shift(staff_world["bar"], date(2026, 8, 30), time(20, 0), time(2, 0))     # previous Sunday, outside
+
+    headers = headers_for(client, "manager@example.com")
+    assert duplicate(client, headers, target="2026-09-14").get_json() == {"created": 1, "skipped": 0}
+
+    copied = shifts_between(client, headers, "2026-09-14", "2026-09-20")
+    assert [s["shift_date"] for s in copied] == ["2026-09-20"]
+
+
+def test_duplicating_an_empty_week_creates_nothing(client, staff_world):
+    headers = headers_for(client, "manager@example.com")
+    response = duplicate(client, headers)
+    assert response.status_code == 200
+    assert response.get_json() == {"created": 0, "skipped": 0}
+
+
+@pytest.mark.parametrize("source,target", [
+    ("2026-09-01", "2026-09-07"),   # source is a Tuesday
+    ("2026-08-31", "2026-09-08"),   # target is a Tuesday
+    ("2026-08-31", "2026-08-31"),   # same week
+    ("31/08/2026", "2026-09-07"),   # wrong format
+    (None, "2026-09-07"),           # missing
+    (20260831, "2026-09-07"),       # not a string
+])
+def test_duplicate_week_rejects_invalid_dates(client, staff_world, source, target):
+    headers = headers_for(client, "manager@example.com")
+    assert duplicate(client, headers, source=source, target=target).status_code == 400

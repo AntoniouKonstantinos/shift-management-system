@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Shift, ShiftCreate, ShiftUpdate } from '../models/shift.model';
+import { DuplicateWeekResult, Shift, ShiftCreate, ShiftUpdate } from '../models/shift.model';
 
 @Injectable({
   providedIn: 'root',
@@ -34,5 +34,12 @@ export class ShiftService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  duplicateWeek(sourceWeekStart: string, targetWeekStart: string): Observable<DuplicateWeekResult> {
+    return this.http.post<DuplicateWeekResult>(`${this.baseUrl}/duplicate-week`, {
+      source_week_start: sourceWeekStart,
+      target_week_start: targetWeekStart,
+    });
   }
 }

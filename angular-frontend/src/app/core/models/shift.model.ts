@@ -36,3 +36,8 @@ export interface ShiftUpdate {
   required_staff?: number;
   notes?: string | null;
 }
+
+export interface DuplicateWeekResult {
+  created: number;
+  skipped: number;
+}

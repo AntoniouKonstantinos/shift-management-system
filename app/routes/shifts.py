@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload, selectinload
 from app import db
@@ -83,6 +83,62 @@ def create_shift():
     db.session.commit()
 
     return jsonify(_serialize(shift)), 201
+
+
+@bp.route("/duplicate-week", methods=["POST"])
+@manager_required
+def duplicate_week():
+    """Copy every shift of one week onto another week. Assignments are not copied."""
+    data = request.get_json(silent=True) or {}
+
+    try:
+        source_start = _parse_date(data.get("source_week_start"))
+        target_start = _parse_date(data.get("target_week_start"))
+    except (ValueError, TypeError):
+        return jsonify({
+            "error": "source_week_start and target_week_start must be dates in the format YYYY-MM-DD"
+        }), 400
+
+    if source_start.weekday() != 0 or target_start.weekday() != 0:
+        return jsonify({"error": "Both dates must be the Monday that starts a week"}), 400
+    if source_start == target_start:
+        return jsonify({"error": "The target week must be different from the source week"}), 400
+
+    source_end = source_start + timedelta(days=6)
+    target_end = target_start + timedelta(days=6)
+    offset = target_start - source_start
+
+    source_shifts = Shift.query.filter(
+        Shift.shift_date >= source_start, Shift.shift_date <= source_end
+    ).all()
+
+    already_there = {
+        (s.department_id, s.shift_date, s.start_time, s.end_time)
+        for s in Shift.query.filter(
+            Shift.shift_date >= target_start, Shift.shift_date <= target_end
+        )
+    }
+
+    created = 0
+    skipped = 0
+    for shift in source_shifts:
+        new_date = shift.shift_date + offset
+        if (shift.department_id, new_date, shift.start_time, shift.end_time) in already_there:
+            skipped += 1
+            continue
+
+        db.session.add(Shift(
+            department_id=shift.department_id,
+            shift_date=new_date,
+            start_time=shift.start_time,
+            end_time=shift.end_time,
+            required_staff=shift.required_staff,
+            notes=shift.notes,
+        ))
+        created += 1
+
+    db.session.commit()
+    return jsonify({"created": created, "skipped": skipped}), (201 if created else 200)
 
 
 @bp.route("/<int:shift_id>", methods=["PUT"])

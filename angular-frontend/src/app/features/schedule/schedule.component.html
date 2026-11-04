@@ -4,6 +4,10 @@
   <button (click)="nextWeek()">Next »</button>
 </div>
 
+<div class="week-toolbar" *ngIf="auth.isManager()">
+  <button type="button" class="copy-week-btn" (click)="copyToNextWeek()">Copy to next week</button>
+</div>
+
 <p *ngIf="loading()">Loading...</p>
 
 <div *ngIf="!loading()" class="calendar-grid">
