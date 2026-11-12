@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { TimeOffRequest } from '../../core/models/time-off-request.model';
 import { TimeOffService } from '../../core/services/time-off.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { ToastService } from '../../core/services/toast.service';
 import { RequestModalComponent } from './request-modal/request-modal.component';
 
 @Component({
@@ -23,6 +25,8 @@ export class TimeOffComponent implements OnInit {
 
   constructor(
     private timeOffService: TimeOffService,
+    private confirmService: ConfirmService,
+    private toast: ToastService,
     public auth: AuthService,
   ) {}
 
@@ -56,26 +60,46 @@ export class TimeOffComponent implements OnInit {
 
   approve(id: number): void {
     this.timeOffService.approve(id).subscribe({
-      next: () => this.loadRequests(),
-      error: (err) => alert(err.error?.error ?? 'Failed to approve request.'),
+      next: () => {
+        this.toast.success('Request approved.');
+        this.loadRequests();
+      },
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to approve the request.'),
     });
   }
 
   reject(id: number): void {
     this.timeOffService.reject(id).subscribe({
-      next: () => this.loadRequests(),
-      error: (err) => alert(err.error?.error ?? 'Failed to reject request.'),
+      next: () => {
+        this.toast.success('Request rejected.');
+        this.loadRequests();
+      },
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to reject the request.'),
     });
   }
 
-  deleteRequest(id: number, message = 'Delete this request?'): void {
-    if (!confirm(message)) {
+  async deleteRequest(request: TimeOffRequest): Promise<void> {
+    const isManager = this.auth.isManager();
+
+    const confirmed = await this.confirmService.confirm({
+      title: isManager ? 'Delete request' : 'Withdraw request',
+      message: isManager
+        ? `Delete the time-off request of ${request.employee_name} ` +
+          `(${request.start_date} – ${request.end_date})?`
+        : `Withdraw your time-off request for ${request.start_date} – ${request.end_date}?`,
+      confirmLabel: isManager ? 'Delete' : 'Withdraw',
+      danger: true,
+    });
+    if (!confirmed) {
       return;
     }
 
-    this.timeOffService.delete(id).subscribe({
-      next: () => this.loadRequests(),
-      error: (err) => alert(err.error?.error ?? 'Failed to delete request.'),
+    this.timeOffService.delete(request.id).subscribe({
+      next: () => {
+        this.toast.success(isManager ? 'Request deleted.' : 'Request withdrawn.');
+        this.loadRequests();
+      },
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to delete the request.'),
     });
   }
 
@@ -98,6 +122,7 @@ export class TimeOffComponent implements OnInit {
 
   onModalSaved(): void {
     this.showModal.set(false);
+    this.toast.success('Time-off request submitted.');
     this.loadRequests();
   }
 }

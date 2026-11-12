@@ -28,7 +28,7 @@
       <td>{{ employee.has_account ? (employee.access_level | titlecase) : 'No login' }}</td>
       <td>
         <button (click)="openEditModal(employee)">Edit</button>
-        <button (click)="deleteEmployee(employee.id)">Delete</button>
+        <button (click)="deleteEmployee(employee)">Delete</button>
       </td>
     </tr>
   </tbody>

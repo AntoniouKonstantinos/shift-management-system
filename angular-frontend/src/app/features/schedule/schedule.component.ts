@@ -4,6 +4,8 @@ import { Shift } from '../../core/models/shift.model';
 import { ShiftService } from '../../core/services/shift.service';
 import { AssignmentService } from '../../core/services/assignment.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { ToastService } from '../../core/services/toast.service';
 import { AssignModalComponent } from './assign-modal/assign-modal.component';
 import { ShiftModalComponent } from './shift-modal/shift-modal.component';
 
@@ -40,6 +42,8 @@ export class ScheduleComponent implements OnInit {
   constructor(
     private shiftService: ShiftService,
     private assignmentService: AssignmentService,
+    private confirmService: ConfirmService,
+    private toast: ToastService,
     public auth: AuthService,
   ) {}
 
@@ -78,6 +82,7 @@ export class ScheduleComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
+        this.toast.error('Failed to load the schedule.');
         this.loading.set(false);
       },
     });
@@ -139,6 +144,7 @@ export class ScheduleComponent implements OnInit {
 
   onAssignModalSaved(): void {
     this.activeShiftId.set(null);
+    this.toast.success('Staff member assigned.');
     this.loadWeek(false);
   }
 
@@ -159,33 +165,43 @@ export class ScheduleComponent implements OnInit {
   }
 
   onShiftModalSaved(): void {
+    const wasEditing = this.editingShift() !== null;
     this.shiftModalOpen.set(false);
+    this.toast.success(wasEditing ? 'Shift updated.' : 'Shift created.');
     this.loadWeek(false);
   }
 
-  deleteShift(shift: Shift): void {
-    const warning =
+  async deleteShift(shift: Shift): Promise<void> {
+    const people =
       shift.assigned_count > 0
         ? ` The ${shift.assigned_count} assigned staff will be removed from it.`
         : '';
-    const message =
-      `Delete the ${shift.department} shift on ${shift.shift_date} ` +
-      `(${shift.start_time}–${shift.end_time})?${warning}`;
 
-    if (!confirm(message)) {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Delete shift',
+      message:
+        `Delete the ${shift.department} shift on ${shift.shift_date} ` +
+        `(${shift.start_time}–${shift.end_time})?${people}`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) {
       return;
     }
 
     this.shiftService.delete(shift.id).subscribe({
-      next: () => this.loadWeek(false),
-      error: (err) => alert(err.error?.error ?? 'Failed to delete the shift.'),
+      next: () => {
+        this.toast.success('Shift deleted.');
+        this.loadWeek(false);
+      },
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to delete the shift.'),
     });
   }
 
-  copyToNextWeek(): void {
+  async copyToNextWeek(): Promise<void> {
     const shiftCount = this.days().reduce((total, day) => total + day.shifts.length, 0);
     if (shiftCount === 0) {
-      alert('There are no shifts in this week to copy.');
+      this.toast.info('There are no shifts in this week to copy.');
       return;
     }
 
@@ -194,27 +210,34 @@ export class ScheduleComponent implements OnInit {
     target.setDate(target.getDate() + 7);
     const targetStart = this.formatDate(target);
 
-    const message =
-      `Copy the ${shiftCount} shifts of this week to the week starting ${targetStart}? ` +
-      'Assigned staff are not copied, and shifts that already exist skipped.';
-    if (!confirm(message)) {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Copy week',
+      message:
+        `Copy the ${shiftCount} shifts of this week to the week starting ${targetStart}? ` +
+        'Assigned staff are not copied, and shifts that already exist there are skipped.',
+      confirmLabel: 'Copy',
+    });
+    if (!confirmed) {
       return;
     }
 
     this.shiftService.duplicateWeek(this.formatDate(source), targetStart).subscribe({
       next: (result) => {
         const skipped = result.skipped > 0 ? ` (${result.skipped} already existed)` : '';
-        alert(`Copied ${result.created} shifts${skipped}.`);
+        this.toast.success(`Copied ${result.created} shifts${skipped}.`);
         this.nextWeek();
       },
-      error: (err) => alert(err.error?.error ?? 'Failed to copy the week.'),
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to copy the week.'),
     });
   }
 
   removeAssignment(assignmentId: number): void {
     this.assignmentService.remove(assignmentId).subscribe({
-      next: () => this.loadWeek(false),
-      error: (err) => alert(err.error?.error ?? 'Failed to remove the assignment.'),
+      next: () => {
+        this.toast.success('Removed from the shift.');
+        this.loadWeek(false);
+      },
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to remove the assignment.'),
     });
   }
 }

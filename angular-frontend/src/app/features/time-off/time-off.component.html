@@ -45,14 +45,14 @@
             <button class="reject-btn" (click)="reject(request.id)">Reject</button>
           </ng-container>
           <ng-template #decided>
-            <button class="delete-btn" (click)="deleteRequest(request.id)">Delete</button>
+            <button class="delete-btn" (click)="deleteRequest(request)">Delete</button>
           </ng-template>
         </ng-container>
 
         <button
           *ngIf="!auth.isManager() && request.status === 'pending'"
           class="delete-btn"
-          (click)="deleteRequest(request.id, 'Withdraw this request?')"
+          (click)="deleteRequest(request)"
         >
           Withdraw
         </button>
