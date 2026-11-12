@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Availability, DAY_NAMES } from '../../core/models/availability.model';
@@ -6,6 +6,7 @@ import { Employee } from '../../core/models/employee.model';
 import { AvailabilityService } from '../../core/services/availability.service';
 import { EmployeeService } from '../../core/services/employee.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 interface DayRow {
   index: number;
@@ -21,6 +22,9 @@ interface DayRow {
   styleUrl: './availability.component.css',
 })
 export class AvailabilityComponent implements OnInit {
+
+  private toast = inject(ToastService);
+
   readonly dayNames = DAY_NAMES;
 
   employees = signal<Employee[]>([]);
@@ -101,7 +105,7 @@ export class AvailabilityComponent implements OnInit {
     });
   }
 
-    addSlot(): void {
+  addSlot(): void {
     const employeeId = this.selectedEmployeeId();
     const start = this.startTime();
     const end = this.endTime();
@@ -110,11 +114,11 @@ export class AvailabilityComponent implements OnInit {
       return;
     }
     if (!start || !end) {
-      alert('Please choose a start and an end time.');
+      this.toast.error('Please choose a start and an end time.');
       return;
     }
     if (start === end) {
-      alert('Start and end time cannot be the same.');
+      this.toast.error('Start and end time cannot be the same.');
       return;
     }
 
@@ -122,14 +126,14 @@ export class AvailabilityComponent implements OnInit {
       .create(employeeId, { day_of_week: this.day(), start_time: start, end_time: end })
       .subscribe({
         next: () => this.loadSlots(),
-        error: (err) => alert(err.error?.error ?? 'Failed to add availability.'),
+        error: (err) => this.toast.error(err.error?.error ?? 'Failed to add availability.'),
       });
   }
 
   deleteSlot(slot: Availability): void {
     this.availabilityService.delete(slot.employee_id, slot.id).subscribe({
       next: () => this.loadSlots(),
-      error: (err) => alert(err.error?.error ?? 'Failed to remove availability.'),
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to remove availability.'),
     });
   }
 }

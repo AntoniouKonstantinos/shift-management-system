@@ -1,10 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output, computed, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  computed,
+  signal,
+  inject
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Department } from '../../../core/models/department.model';
 import { Shift, ShiftCreate } from '../../../core/models/shift.model';
 import { DepartmentService } from '../../../core/services/department.service';
 import { ShiftService } from '../../../core/services/shift.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-shift-modal',
@@ -14,6 +24,9 @@ import { ShiftService } from '../../../core/services/shift.service';
   styleUrl: './shift-modal.component.css',
 })
 export class ShiftModalComponent implements OnInit {
+
+  private toast = inject(ToastService);
+
   @Input() shift: Shift | null = null;
   @Input() initialDate: string | null = null;
   @Output() close = new EventEmitter<void>();
@@ -65,15 +78,15 @@ export class ShiftModalComponent implements OnInit {
     const requiredStaff = this.requiredStaff();
 
     if (departmentId === null || !this.shiftDate() || !this.startTime() || !this.endTime()) {
-      alert('Please fill in the department, the date and both times.');
+      this.toast.error('Please fill in the department, the date and both times.');
       return;
     }
     if (this.startTime() === this.endTime()) {
-      alert('Start and end time cannot be the same.');
+      this.toast.error('Start and end time cannot be the same.');
       return;
     }
     if (requiredStaff === null || !Number.isInteger(requiredStaff) || requiredStaff < 1) {
-      alert('Staff needed must be a whole number of at least 1.');
+      this.toast.error('Staff needed must be a whole number of at least 1.');
       return;
     }
 
@@ -99,7 +112,7 @@ export class ShiftModalComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        alert(err.error?.error ?? 'Failed to save the shift.');
+        this.toast.error(err.error?.error ?? 'Failed to save the shift.');
       },
     });
   }

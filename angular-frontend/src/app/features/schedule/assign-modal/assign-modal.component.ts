@@ -7,11 +7,13 @@ import {
   OnChanges,
   SimpleChanges,
   signal,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AssignCandidate } from '../../../core/models/assignment.model';
 import { AssignmentService } from '../../../core/services/assignment.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-assign-modal',
@@ -21,6 +23,9 @@ import { AssignmentService } from '../../../core/services/assignment.service';
   styleUrl: './assign-modal.component.css',
 })
 export class AssignModalComponent implements OnInit, OnChanges {
+
+  private toast = inject(ToastService);
+
   @Input({ required: true }) shiftId!: number;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -63,13 +68,13 @@ export class AssignModalComponent implements OnInit, OnChanges {
   onAssign(): void {
     const employeeId = this.selectedEmployeeId();
     if (!employeeId) {
-      alert('Please select an employee.');
+      this.toast.error('Please select an employee.');
       return;
     }
 
     this.assignmentService.assign(this.shiftId, { employee_id: employeeId }).subscribe({
       next: () => this.saved.emit(),
-      error: (err) => alert(err.error?.error ?? 'Failed to assign employee.'),
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to assign employee.'),
     });
   }
 

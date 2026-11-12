@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Employee } from '../../../core/models/employee.model';
@@ -6,6 +6,7 @@ import { TimeOffRequestCreate } from '../../../core/models/time-off-request.mode
 import { EmployeeService } from '../../../core/services/employee.service';
 import { TimeOffService } from '../../../core/services/time-off.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-request-modal',
@@ -15,6 +16,9 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './request-modal.component.css',
 })
 export class RequestModalComponent implements OnInit {
+
+  private toast = inject(ToastService);
+
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -71,7 +75,7 @@ export class RequestModalComponent implements OnInit {
 
     this.timeOffService.create(payload).subscribe({
       next: () => this.saved.emit(),
-      error: (err) => alert(err.error?.error ?? 'Failed to create request.'),
+      error: (err) => this.toast.error(err.error?.error ?? 'Failed to create request.'),
     });
   }
 

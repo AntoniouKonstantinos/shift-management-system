@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
   signal,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { Role } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { EmployeeService } from '../../../core/services/employee.service';
 import { MIN_PASSWORD_LENGTH } from '../../../core/constants';
+import { ToastService } from '../../../core/services/toast.service';
 
 
 @Component({
@@ -26,6 +28,9 @@ import { MIN_PASSWORD_LENGTH } from '../../../core/constants';
   styleUrl: './employee-modal.component.css',
 })
 export class EmployeeModalComponent implements OnInit, OnChanges {
+
+  private toast = inject(ToastService);
+
   @Input() employee: Employee | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -121,7 +126,7 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
       };
       this.employeeService.update(this.employee.id, payload).subscribe({
         next: () => this.saved.emit(),
-        error: (err) => alert(err.error?.error ?? 'Failed to update employee.'),
+        error: (err) => this.toast.error(err.error?.error ?? 'Failed to update employee.'),
       });
     } else {
       const payload: EmployeeCreate = {
@@ -133,7 +138,7 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
       };
       this.employeeService.create(payload).subscribe({
         next: () => this.saved.emit(),
-        error: (err) => alert(err.error?.error ?? 'Failed to create employee.'),
+        error: (err) => this.toast.error(err.error?.error ?? 'Failed to create employee.'),
       });
     }
   }
