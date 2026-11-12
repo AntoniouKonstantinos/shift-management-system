@@ -55,12 +55,12 @@ export class RequestModalComponent implements OnInit {
     const endDate = this.endDate();
 
     if (!startDate || !endDate || (isManager && !employeeId)) {
-      alert('Please fill in all required fields.');
+      this.toast.error('Please fill in all required fields.');
       return;
     }
 
     if (startDate > endDate) {
-      alert('Start date must be before or equal to end date.');
+      this.toast.error('Start date must be before or equal to end date.');
       return;
     }
 

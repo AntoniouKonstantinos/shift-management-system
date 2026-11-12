@@ -100,13 +100,13 @@ export class EmployeeModalComponent implements OnInit, OnChanges {
   onSubmit(): void {
     const roleId = this.roleId();
     if (!roleId) {
-      alert('Please select a role.');
+      this.toast.error('Please select a role.');
       return;
     }
 
     const password = this.password();
     if (password && password.length < MIN_PASSWORD_LENGTH) {
-      alert(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      this.toast.error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
 
