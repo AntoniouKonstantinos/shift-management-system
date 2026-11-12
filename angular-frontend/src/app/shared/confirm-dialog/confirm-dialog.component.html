@@ -1,0 +1,31 @@
+<div
+  class="modal"
+  *ngIf="confirmService.request() as pending"
+  role="presentation"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="modal-content confirm"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirm-title"
+    aria-describedby="confirm-message"
+  >
+    <h3 id="confirm-title">{{ pending.options.title }}</h3>
+    <p id="confirm-message" class="confirm-message">{{ pending.options.message }}</p>
+
+    <div class="modal-actions">
+      <button
+        type="button"
+        class="confirm-btn"
+        [class.danger]="pending.options.danger"
+        (click)="confirmService.answer(true)"
+      >
+        {{ pending.options.confirmLabel ?? 'Confirm' }}
+      </button>
+      <button #cancelButton type="button" (click)="confirmService.answer(false)">
+        {{ pending.options.cancelLabel ?? 'Cancel' }}
+      </button>
+    </div>
+  </div>
+</div>

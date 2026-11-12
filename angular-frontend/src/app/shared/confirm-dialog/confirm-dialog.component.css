@@ -1,0 +1,26 @@
+.confirm {
+  max-width: 420px;
+}
+
+.confirm-message {
+  margin: 0 0 4px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modal-actions .confirm-btn[type="button"] {
+  background: var(--color-primary);
+}
+
+.modal-actions .confirm-btn[type="button"]:hover {
+  background: var(--color-primary-hover);
+}
+
+.modal-actions .confirm-btn.danger[type="button"] {
+  background: var(--color-rejected);
+}
+
+.modal-actions .confirm-btn.danger[type="button"]:hover {
+  background: #c53c40;
+}

@@ -1,0 +1,18 @@
+<div class="toast-stack" aria-live="polite">
+  <div
+    class="toast"
+    *ngFor="let toast of toastService.toasts(); trackBy: trackById"
+    [ngClass]="'toast-' + toast.kind"
+    [attr.role]="toast.kind === 'error' ? 'alert' : 'status'"
+  >
+    <span class="toast-message">{{ toast.message }}</span>
+    <button
+      type="button"
+      class="toast-close"
+      aria-label="Dismiss notification"
+      (click)="toastService.dismiss(toast.id)"
+    >
+      ×
+    </button>
+  </div>
+</div>
